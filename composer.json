@@ -8,7 +8,9 @@
         "php": ">=5.5.9",
         "laravel/framework": "5.2.*",
         "dingo/api":"1.0.*@dev",
-        "tymon/jwt-auth":"1.*@rc"
+        "tymon/jwt-auth":"1.*@rc",
+        "encore/laravel-admin": "1.2.*",
+        "zgldh/qiniu-laravel-storage": "^0.10.3"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

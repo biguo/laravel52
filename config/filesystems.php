@@ -61,7 +61,24 @@ return [
             'region' => 'your-region',
             'bucket' => 'your-bucket',
         ],
-
+        'admin' => [
+            'driver'     => 'local',
+            'root'       => public_path('upload'),
+            'visibility' => 'public',
+            'url' => env('APP_URL').'/public/upload/',
+        ],
+        'qiniu' => [
+            'driver'  => 'qiniu',
+            'domains' => [
+                'default'   => 'upload.binghuozhijia.com', //你的七牛域名
+                'https'     => 'upload.binghuozhijia.com',         //你的HTTPS域名
+                'custom'    => 'upload.binghuozhijia.com',     //你的自定义域名
+            ],
+            'access_key'=> 'UhaN-DY9xXFQ5vCa235W2to1Ot0GnAGW-xv6G8ly',  //AccessKey
+            'secret_key'=> '5UZLH-mPqUqR0leJl-Wi_Tnrx8Bv-k9KSmrSNoZT',  //SecretKey
+            'bucket'    => 'bhzj',  //Bucket名字
+            'notify_url'=> '',  //持久化处理回调地址
+        ],
     ],
 
 ];

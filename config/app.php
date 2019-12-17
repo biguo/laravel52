@@ -157,6 +157,8 @@ return [
         App\Providers\RouteServiceProvider::class,
         Dingo\Api\Provider\LaravelServiceProvider::class,
         Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
+        Encore\Admin\Providers\AdminServiceProvider::class,
+        zgldh\QiniuStorage\QiniuFilesystemServiceProvider::class
     ],
 
     /*
