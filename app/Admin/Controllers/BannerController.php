@@ -110,7 +110,6 @@ class BannerController extends Controller
 
             $form->display('id', 'ID');
             $form->text('title', 'title');
-            $form->text('content', 'content');
             $form->ckeditor('content', 'content');
             $form->image('image', 'image');
             $form->display('created_at', 'Created At');
