@@ -109,7 +109,7 @@ class BannerController extends Controller
         return Admin::form(Banner::class, function (Form $form) {
 
             $form->display('id', 'ID');
-            $form->text('title', 'title');
+            $form->text('title', 'title')->rules('required|min:3');
             $form->ckeditor('content', 'content');
             $form->image('image', 'image');
             $form->display('created_at', 'Created At');
