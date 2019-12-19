@@ -27,8 +27,9 @@ app('api.exception')->register(function (Exception $exception) {
 
 $api->version('v1', ['namespace' => 'App\Api\Controllers'], function ($api) {
 
-    $api->get('member/{id}', 'MemberController@show');
-    $api->post('member', 'MemberController@create');
+    $api->any('member/wxLogin', 'MemberController@wxLogin');//小程序用户登陆
+    $api->any('member/wxRegister', 'MemberController@wxRegister');//小程序用户注册
+    $api->any('member/getOpenid', 'MemberController@getOpenid');//小程序获取openid
 
 //    jwt 系列
     $api->post('user/login', 'AuthController@login');  //登录授权

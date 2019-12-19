@@ -21,7 +21,10 @@
     },
     "autoload": {
         "classmap": [
-            "database"
+            "database",
+            "app/Tools/SmsCode/SmsCode.php",
+            "app/Tools/SmsCode/Ucpaas.php",
+            "app/Tools/Pay/Wechatpay.php"
         ],
         "psr-4": {
             "App\\": "app/"
