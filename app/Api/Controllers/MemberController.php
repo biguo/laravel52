@@ -18,6 +18,9 @@ class MemberController extends BaseController
         $array = ['name' => 'Desk', 'price' => 100, 'orders' => 10];
         $array = array_only($array, ['name', 'price','sony']);
         print_r($array);
+
+        print_r(config('filesystems.disks.qiniu'));
+
     }
 
     public function wxLogin(Request $request, JWTAuth $JWTAuth)
