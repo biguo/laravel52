@@ -55,28 +55,6 @@ class BannerController extends Controller
         });
     }
 
-//    public function update($id)
-//    {
-//        $params = Input::all();
-//        echo "<pre>";
-//        print_r($params);
-//        exit;
-////        admin_toastr(trans('admin::lang.update_succeeded'));
-////        $url = Input::get('_previous_') ?: $this->resource(-1);
-////        return redirect($url);
-//    }
-
-    public function update()
-    {
-        if(!is_null(request()->get('status'))){
-            $status = request()->get('status')==='on'?1:0;
-        }
-        $data = request()->all();
-        $id_arr = request()->route()->parameters();
-
-        return $this->form()->update($id_arr['banner'],$data);
-    }
-
     /**
      * Create interface.
      *
@@ -105,7 +83,8 @@ class BannerController extends Controller
 //            $grid->column('username', '用户名');
 //            $grid->paginate(15);
 //            $grid->perPages([10, 20, 30, 40, 50]);
-
+            $grid->model()->where('admin_user_id',$this->mid)->orderBy('status', 'desc')->orderBy('sort')->orderBy('id', 'desc');
+            $grid->disableExport();
             $grid->id('ID')->sortable();
             $grid->title()->editable();
             $grid->image()->image('http://upload.binghuozhijia.com/', 100, 100);
@@ -122,22 +101,11 @@ class BannerController extends Controller
 //                }, 'Search');
             });
 
-
-            // 设置text、color、和存储值
-
-            $states = [
-                '1'  => ['value' => 1, 'text' => '打开', 'color' => 'primary'],
-                '0' => ['value' => 0, 'text' => '关闭', 'color' => 'default'],
-            ];
-            $grid->status()->switch($states);
+            $grid->sort()->editable();
+            $grid->status()->switch();
 //            $grid->column('status', '状态')->display(function ($status) {
 //                return $status ? '开启' : '关闭';
 //            });
-
-
-
-
-
         });
     }
 
@@ -153,10 +121,10 @@ class BannerController extends Controller
             $form->display('id', 'ID');
             $form->text('title', 'title')->rules('required|min:3');
             $form->ckeditor('content', 'content');
-            $form->text('status', 'status');
             $form->image('image', 'image');
-            $form->display('created_at', 'Created At');
-            $form->display('updated_at', 'Updated At');
+            $form->hidden('sort');
+            $form->hidden('status');
+            $form->hidden('admin_user_id', 'admin_user_id')->default($this->mid);;
         });
     }
 }

@@ -12,6 +12,7 @@ Route::group([
 
     $router->get('/', 'HomeController@index');
     $router->resource('banner', BannerController::class);
-    $router->get('/country', 'CountryController@index');
+    $router->resource('country', CountryController::class);
+//    $router->get('/country', 'CountryController@index');
 
 });

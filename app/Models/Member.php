@@ -36,7 +36,7 @@ class Member extends Model
     }
 
 
-    public static function getMemberByid($mid)
+    public static function getMemberById($mid)
     {
         return Member::where('id', $mid)->first();
     }
@@ -54,7 +54,6 @@ class Member extends Model
             'phone',
             'nickname',
             'idcardno',
-            'birthday',
             'headpic',
             'verstatus',
             'cardfront',

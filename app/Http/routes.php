@@ -30,6 +30,7 @@ $api->version('v1', ['namespace' => 'App\Api\Controllers'], function ($api) {
     $api->any('member/wxLogin', 'MemberController@wxLogin');//小程序用户登陆
     $api->any('member/wxRegister', 'MemberController@wxRegister');//小程序用户注册
     $api->any('member/getOpenid', 'MemberController@getOpenid');//小程序获取openid
+    $api->any('member/minfo', 'MemberController@minfo');//
 
 //    jwt 系列
     $api->post('user/login', 'AuthController@login');  //登录授权

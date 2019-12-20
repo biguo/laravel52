@@ -13,6 +13,13 @@ use Tymon\JWTAuth\JWTAuth;
 class MemberController extends BaseController
 {
 
+    public function minfo()
+    {
+        $array = ['name' => 'Desk', 'price' => 100, 'orders' => 10];
+        $array = array_only($array, ['name', 'price','sony']);
+        print_r($array);
+    }
+
     public function wxLogin(Request $request, JWTAuth $JWTAuth)
     {
         if ($request->isMethod('POST')) {
@@ -78,7 +85,7 @@ class MemberController extends BaseController
                 }
             }
 
-            $minfo = Member::getMemberByid($mid);
+            $minfo = Member::getMemberById($mid);
             $member = $minfo->toarray();
             $member['jwttoken'] = $this->JwtEncryption($minfo, $JWTAuth);
             return responseSuccess($member, '注册成功');
@@ -94,7 +101,7 @@ class MemberController extends BaseController
             if (empty($data['code'])) {
                 return responseError('必传字段为空');
             }
-            $counrty = DB::table('counrty')->where('slug', $data['slug'])->first();
+            $counrty = DB::table('country')->where('slug', $data['slug'])->first();
             $curl = curl_init();
             //使用curl_setopt() 设置要获得url地址
             $url = "https://api.weixin.qq.com/sns/jscode2session?appid=$counrty->appid&secret=$counrty->appsecret&js_code=" . $data['code'] . '&grant_type=authorization_code';
