@@ -14,15 +14,6 @@ use DB;
 class CommonController extends BaseController
 {
 
-    protected $request;
-    protected $JWTAuth;
-
-    public function __construct(Request $request, JWTAuth $JWTAuth)
-    {
-        $this->request = $request;
-        $this->JWTAuth = $JWTAuth;
-    }
-
     //发送短信验证码
     public function getSmsCode(Request $request)
     {
@@ -82,7 +73,7 @@ class CommonController extends BaseController
         return responseSuccess($url);
     }
 
-    public function uploadImg(Request $request)
+    public function uploadImg()
     {
         $tmpFile = @$_FILES['imgFile']['tmp_name'];
         $qiniu = new FileModel();

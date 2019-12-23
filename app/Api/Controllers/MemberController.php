@@ -13,17 +13,23 @@ use Tymon\JWTAuth\JWTAuth;
 class MemberController extends BaseController
 {
 
-    public function minfo()
+    public function minfo(Request $request)
     {
-        $array = ['name' => 'Desk', 'price' => 100, 'orders' => 10];
-        $array = array_only($array, ['name', 'price','sony']);
-        print_r($array);
-
-        print_r(config('filesystems.disks.qiniu'));
-
+        if ($request->isMethod('GET')) {
+            $mid = $this->checkLogin($request);
+            $result = Member::getMemberById($mid);
+            if (!$result)
+                $array = array();
+            else {
+                $array = $result->toarray();
+                $array = array_only($array, ['id', 'phone', 'headpic', 'nickname']);
+            }
+            return responseSuccess($array);
+        }
+        return responseError('非法请求');
     }
 
-    public function wxLogin(Request $request, JWTAuth $JWTAuth)
+    public function wxLogin(Request $request)
     {
         if ($request->isMethod('POST')) {
             $data = $request->all();
@@ -35,9 +41,9 @@ class MemberController extends BaseController
 
             if ($minfo) {
                 $member = $minfo->toarray();
-                Redis::set('user:openid:' . $member['id'], $data['uid']);  //指定当前的用户在哪个村的小程序
+                Redis::set('country:openid:' . $member['id'], $data['uid']);  //指定当前的用户在哪个村的小程序
 
-                $member['jwttoken'] = $this->JwtEncryption($minfo, $JWTAuth);
+                $member['jwttoken'] = $this->JwtEncryption($minfo);
                 $member['introducer'] = DB::table('member as m')->where('id', $member['pid'])->value('nickname');
                 $member['country_id'] = $country_id;
                 $member['exist'] = 1;
@@ -51,7 +57,7 @@ class MemberController extends BaseController
             return responseError('非法请求');
     }
 
-    public function wxRegister(Request $request, JWTAuth $JWTAuth)
+    public function wxRegister(Request $request)
     {
         if ($request->isMethod('POST')) {
             $data = $request->all();
@@ -90,7 +96,7 @@ class MemberController extends BaseController
 
             $minfo = Member::getMemberById($mid);
             $member = $minfo->toarray();
-            $member['jwttoken'] = $this->JwtEncryption($minfo, $JWTAuth);
+            $member['jwttoken'] = $this->JwtEncryption($minfo);
             return responseSuccess($member, '注册成功');
         } else
             return responseError('非法请求');

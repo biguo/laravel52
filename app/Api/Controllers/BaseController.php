@@ -4,25 +4,33 @@ namespace App\Api\Controllers;
 
 use App\Http\Controllers\Controller;
 use Tymon\JWTAuth\JWTAuth;
+use Tymon\JWTAuth\Facades\JWTAuth as jwt;
 use Dingo\Api\Routing\Helpers;
+use Illuminate\Http\Request;
 
 class BaseController extends Controller
 {
     use Helpers;
 
-    public function __construct()
-    {
+    protected $JWTAuth;
 
+    public function __construct(JWTAuth $JWTAuth)
+    {
+        $this->JWTAuth = $JWTAuth;
     }
 
     //判断用户是否登陆
-    public function checkLogin($request,$JWTAuth)
+    public function checkLogin($request, $field  = 'id')
     {
         $jwttoken = $request->header("jwttoken");
 
         if($jwttoken!='' && !empty($jwttoken) && $jwttoken !=='[object Undefined]') {
-            if ($minfo = $JWTAuth->toUser($jwttoken)) {
-                return $minfo->toarray()["id"];
+            jwt ::setToken($jwttoken);       //加这一行 这是JWT 0.5和1.0间的区别
+            if ($array = $this->JWTAuth->toUser()->toarray()) {
+                if(isset($field)){
+                    return $array[$field];
+                }
+                return $array;
             }
 
         }
@@ -30,8 +38,8 @@ class BaseController extends Controller
 
     }
     //Jwt给用户加密
-    public function JwtEncryption($data,JWTAuth $JWTAuth)
+    public function JwtEncryption($data)
     {
-        return $JWTAuth->fromUser($data);
+        return $this->JWTAuth->fromUser($data);
     }
 }
