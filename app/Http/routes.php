@@ -36,13 +36,5 @@ $api->version('v1', ['namespace' => 'App\Api\Controllers'], function ($api) {
     $api->any('common/shareXcx', 'CommonController@shareXcx');  // 分享二维码
     $api->any('common/img', 'CommonController@uploadImg');  //上传图片(七牛
 
-//    jwt 系列
-    $api->post('user/login', 'AuthController@login');  //登录授权
-    $api->post('user/register', 'AuthController@register');
-    $api->post('user/logout', 'AuthController@logout');
-    $api->post('user/refresh', 'AuthController@refresh');
-    $api->post('user/me', 'AuthController@me');
-    $api->post('user/refreshTest', 'AuthController@refreshTest');
-    $api->post('user/useTest', 'AuthController@useTest');
 });
 

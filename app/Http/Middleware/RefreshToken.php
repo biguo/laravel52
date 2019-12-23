@@ -3,16 +3,11 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use Auth;
-use Illuminate\Support\Facades\DB;
-use JWTAuth;
-use App\User;
-use Illuminate\Support\Facades\Log;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Http\Middleware\BaseMiddleware;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 
-class RefreshToken extends BaseMiddleware
+class RefreshToken extends BaseMiddleware  //这个其实没有用上, 因为是微信小程序后台
 {
     /***
      * Handle an incoming request.

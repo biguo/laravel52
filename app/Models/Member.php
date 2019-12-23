@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Foundation\Auth\User as Authenticatable ;
 
-class Member extends Model
+class Member extends Authenticatable implements JWTSubject
 {
 
     protected $table = 'member'; //指定表名
@@ -28,11 +29,13 @@ class Member extends Model
         $data['headpic'] = isset($data['headpic']) ? $data['headpic'] : Default_Pic;
         $data['regtime'] = date('Y-m-d H:i:s', time());
         $data['regip'] = $_SERVER['SERVER_ADDR'];
-        $data['pid'] = (isset($data['pphone']) && trim($data['pphone']) != '' && self::where('phone', $data['pphone'])->value('id')) ? self::where('phone', $data['pphone'])->value('id') : 0;
-
         $data = array_except($data, ['vercode', 'pphone', 'uid']);
-
-        return DB::table('member')->insertGetId($data);
+        $mid = DB::table('member')->insertGetId($data);
+        $original = DB::connection('original')->table("member")->where('phone', $data['phone'])->first();  //同步此用户到app,但仅是同步手机号, 账户等信息不互通
+        if(!$original){
+            DB::connection('original')->table('member')->insert($data);
+        }
+        return $mid;
     }
 
 
@@ -68,4 +71,23 @@ class Member extends Model
         return DB::table('member')->where('id', $mid)->update($update);
     }
 
+    /**
+     * Get the identifier that will be stored in the subject claim of the JWT.
+     *
+     * @return mixed
+     */
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    /**
+     * Return a key value array, containing any custom claims to be added to the JWT.
+     *
+     * @return array
+     */
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
 }
