@@ -2,12 +2,8 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\Product;
 
-use App\Models\Banner;
-
-
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Input;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Facades\Admin;
@@ -15,9 +11,8 @@ use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\ModelForm;
 
-class BannerController extends Controller
+class ProductController extends Controller
 {
-
     use ModelForm;
 
     /**
@@ -29,8 +24,8 @@ class BannerController extends Controller
     {
         return Admin::content(function (Content $content) {
 
-            $content->header('轮播图');
-            $content->description('首页轮播图');
+            $content->header('充值产品');
+            $content->description('充值及优惠福利');
 
             $content->body($this->grid());
         });
@@ -44,9 +39,6 @@ class BannerController extends Controller
      */
     public function edit($id)
     {
-
-//        return view('banner.edit',[]);
-
         return Admin::content(function (Content $content) use ($id) {
 
             $content->header('header');
@@ -79,25 +71,29 @@ class BannerController extends Controller
      */
     protected function grid()
     {
-        return Admin::grid(Banner::class, function (Grid $grid) {
+        return Admin::grid(Product::class, function (Grid $grid) {
             $grid->model()->where('country_id',$this->country)->orderBy('status', 'desc')->orderBy('sort')->orderBy('id', 'desc');
             $grid->disableExport();
+            $grid->disableRowSelector();
             $grid->id('ID')->sortable();
             $grid->title()->editable();
             $grid->image()->image('http://upload.binghuozhijia.com/', 100, 100);
-            $grid->created_at();
-            $grid->updated_at();
+            $grid->price()->editable();
             $grid->filter(function ($filter) {
 //                $filter->useModal();
                 $filter->disableIdFilter();
                 $filter->like('title', 'Search');
             });
 
-            $grid->sort()->editable();
+            $grid->sort()->editable()->sortable();
             $grid->status()->switch();
-//            $grid->column('status', '状态')->display(function ($status) {
-//                return $status ? '开启' : '关闭';
-//            });
+            $grid->column('single','单间9折入住券');
+            $grid->column('whole','整栋8.5折入住券');
+            $grid->column('coffee','咖啡券');
+            $grid->column('wine','香槟');
+            $grid->column('cake','小蛋糕');
+
+            $grid->updated_at();
         });
     }
 
@@ -108,15 +104,23 @@ class BannerController extends Controller
      */
     protected function form()
     {
-        return Admin::form(Banner::class, function (Form $form) {
+        return Admin::form(Product::class, function (Form $form) {
 
             $form->display('id', 'ID');
             $form->text('title', 'title')->rules('required|min:3');
-            $form->ckeditor('content', 'content');
             $form->image('image', 'image');
+            $form->number('price', 'price')->rules('required|regex:/^[1-9]\d*(\.\d+)?$/');  //大于1的正数
+            $form->number('single', '单间9折入住券')->rules('required|regex:/^[0-9]\d*$/');  //非负整数
+            $form->number('whole', '整栋8.5折入住券')->rules('required|regex:/^[0-9]\d*$/');
+            $form->number('coffee', '咖啡券')->rules('required|regex:/^[0-9]\d*$/');
+            $form->number('wine', '持卡人生日赠送香槟')->rules('required|regex:/^[0-9]\d*$/');
+            $form->number('cake', '持卡人生日送小蛋糕')->rules('required|regex:/^[0-9]\d*$/');
+            $form->ckeditor('content', 'content');
+            $form->hidden('country_id','country_id')->default($this->country);
             $form->hidden('sort');
             $form->hidden('status');
-            $form->hidden('country_id','country_id')->default($this->country);
+            $form->display('created_at', 'Created At');
+            $form->display('updated_at', 'Updated At');
         });
     }
 }

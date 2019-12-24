@@ -6,11 +6,9 @@ use Encore\Admin\Admin;
 
 class CheckRow
 {
-    protected $id;
 
-    public function __construct($id)
+    public function __construct()
     {
-        $this->id = $id;
     }
 
     protected function script()
@@ -21,7 +19,7 @@ class CheckRow
 $('.grid-check-row').on('change', function () {
 
     // Your code.
-    let id = $(this).data('id');
+    let id = $(this).val();
     let token = $('#csrf').val();
 
     
@@ -42,7 +40,7 @@ SCRIPT;
     protected function render()
     {
         Admin::script($this->script());
-        return "<input class='form-control grid-check-row' data-id='{$this->id}'  />";
+        return "<input class='form-control grid-check-row'  />";
     }
 
     public function __toString()

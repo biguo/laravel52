@@ -82,9 +82,10 @@ class CountryController extends Controller
             $grid->model()->from('country as c')->leftJoin('admin_users as u','u.id','=','c.admin_user_id')
                 ->select('c.id','c.title','c.appid','c.appsecret','c.status','u.name as username');
 
-            $grid->disableCreation();
+//            $grid->disableCreation();
             $grid->disableFilter();
-
+            $grid->disableRowSelector();
+//            $grid->disableActions();
             $grid->column('id', 'ID');
             $grid->column('title', '项目名')->editable();
             $grid->column('appid', '小程序id')->editable();
@@ -92,11 +93,6 @@ class CountryController extends Controller
             $grid->column('username', '设置管理员');
 
             $grid->status()->switch();
-//            $grid->actions(function ($actions) {
-//                $actions->disableDelete();
-//                $actions->disableEdit();
-//                $actions->append(new CheckRow($actions->getKey()));
-//            });
 
         });
     }
@@ -116,7 +112,10 @@ class CountryController extends Controller
             $form->text('appid', '小程序id');
             $form->text('appsecret', '小程序secret');
             $form->hidden('status');
-
+            $form->select('admin_user_id')->options(function () {
+                return Administrator::pluck('name', 'id');
+            })->default($this->mid);
+//            $form->html(new CheckRow());
 //            $form->saving(function (Form $form) {
 
 
