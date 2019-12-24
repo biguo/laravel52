@@ -7,4 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Banner extends Model
 {
     protected $table = 'banner';
+
+    public function country() {
+        return $this->belongsTo(Country::class);
+    }
 }

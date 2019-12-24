@@ -6,7 +6,6 @@ use App\Models\FileModel;
 use App\Models\Member;
 use Illuminate\Support\Facades\Redis;
 use Tools\SmsCode\SmsCode;
-use Tymon\JWTAuth\JWTAuth;
 use Validator;
 use Illuminate\Http\Request;
 use DB;

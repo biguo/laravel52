@@ -268,7 +268,7 @@ class Wechatpay
         $xml = "<root>";
         foreach ($arr as $key => $val) {
             if (is_array($val)) {
-                $xml .= "<" . $key . ">" . arrayToXml($val) . "</" . $key . ">";
+                $xml .= "<" . $key . ">" . $this->arrayToXml($val) . "</" . $key . ">";
             } else {
                 $xml .= "<" . $key . ">" . $val . "</" . $key . ">";
             }

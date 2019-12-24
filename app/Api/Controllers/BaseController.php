@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use Tymon\JWTAuth\JWTAuth;
 use Tymon\JWTAuth\Facades\JWTAuth as jwt;
 use Dingo\Api\Routing\Helpers;
-use Illuminate\Http\Request;
 
 class BaseController extends Controller
 {

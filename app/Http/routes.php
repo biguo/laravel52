@@ -36,5 +36,7 @@ $api->version('v1', ['namespace' => 'App\Api\Controllers'], function ($api) {
     $api->any('common/shareXcx', 'CommonController@shareXcx');  // 分享二维码
     $api->any('common/img', 'CommonController@uploadImg');  //上传图片(七牛
 
+    $api->any('banner/list', 'BannerController@getList');  //lbt
+
 });
 

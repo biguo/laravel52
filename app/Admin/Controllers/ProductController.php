@@ -77,7 +77,7 @@ class ProductController extends Controller
             $grid->disableRowSelector();
             $grid->id('ID')->sortable();
             $grid->title()->editable();
-            $grid->image()->image('http://upload.binghuozhijia.com/', 100, 100);
+            $grid->image()->image(Upload_Domain, 100, 100);
             $grid->price()->editable();
             $grid->filter(function ($filter) {
 //                $filter->useModal();

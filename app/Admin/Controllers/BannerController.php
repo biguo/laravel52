@@ -84,7 +84,7 @@ class BannerController extends Controller
             $grid->disableExport();
             $grid->id('ID')->sortable();
             $grid->title()->editable();
-            $grid->image()->image('http://upload.binghuozhijia.com/', 100, 100);
+            $grid->image()->image(Upload_Domain, 100, 100);
             $grid->created_at();
             $grid->updated_at();
             $grid->filter(function ($filter) {

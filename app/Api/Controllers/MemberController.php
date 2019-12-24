@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
 use Tools\SmsCode\SmsCode;
-use Tymon\JWTAuth\JWTAuth;
 
 class MemberController extends BaseController
 {
@@ -110,10 +109,10 @@ class MemberController extends BaseController
             if (empty($data['code'])) {
                 return responseError('必传字段为空');
             }
-            $counrty = DB::table('country')->where('slug', $data['slug'])->first();
+            $country = DB::table('country')->where('slug', $data['slug'])->first();
             $curl = curl_init();
             //使用curl_setopt() 设置要获得url地址
-            $url = "https://api.weixin.qq.com/sns/jscode2session?appid=$counrty->appid&secret=$counrty->appsecret&js_code=" . $data['code'] . '&grant_type=authorization_code';
+            $url = "https://api.weixin.qq.com/sns/jscode2session?appid=$country->appid&secret=$country->appsecret&js_code=" . $data['code'] . '&grant_type=authorization_code';
             curl_setopt($curl, CURLOPT_URL, $url);
             //设置是否输出header
             curl_setopt($curl, CURLOPT_HEADER, false);
