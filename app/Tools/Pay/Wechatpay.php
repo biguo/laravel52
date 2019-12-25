@@ -137,7 +137,7 @@ class Wechatpay
         return $reqPar;
     }
     
-    public function getXcxPrePayOrder($appid, $body, $out_trade_no, $total_fee, $openid, $notify_url='public/api/Homeorder/homeorderWxpaynotify'){
+    public function getXcxPrePayOrder($appid, $body, $out_trade_no, $total_fee, $openid, $notify_url='public/api/order/orderWxpaynotify'){
         if(empty($body)){
             return responseErrorArr('未知产品名称');
         }

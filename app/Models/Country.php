@@ -32,7 +32,8 @@ class Country extends Model
 
     public function usedBanner()
     {
-        return $this->banners()->where('status', Status_Online)->select('id', 'title', DB::raw("concat('" . Upload_Domain . "', image) as image"), 'sort', 'content')
+        return $this->banners()->where('status', Status_Online)
+            ->select('id', 'title', DB::raw("concat('" . Upload_Domain . "', image) as image"), DB::raw("concat('" . Upload_Domain . "', bigImage) as bigImage"),'sort')
             ->orderBy('sort', 'asc')->get();
     }
 

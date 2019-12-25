@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Tools\Pay\Wechatpay;
 
 class Order extends Model
 {
@@ -44,5 +45,35 @@ class Order extends Model
         }
     }
 
+    /**
+     * @param $tradeno // 订单号
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function doPay($appid,$trade_no, $mid)
+    {
+
+        $Order = DB::table("order")->where([['trade_no', '=', $trade_no], ['status', '=', 1]])->first();
+        if ($Order) { // 订单可以进行支付
+
+            $member_oauth = DB::table("member_oauth")->where(['mid' => $mid, 'oauth_type' => 4, 'delstatus' => DataDeleteStatus_NORMAL])->first();
+            if ((!$member_oauth) || (!$member_oauth->openid2)) {
+                return responseError("未绑定openid");
+            }
+            $wechatPay = new Wechatpay();
+            $prepay_ver = $wechatPay->getXcxPrePayOrder($appid,$Order->title, $Order->tradeno, $Order->price * 100, $member_oauth->openid2, 'public/api/order/orderWxpaynotify');
+
+            // return  responseError("sdvsdvdss",$prepay_ver);
+            if (empty($prepay_ver) || !is_array($prepay_ver)) {
+                return responseError('获取预支付订单失败');
+            }
+
+            $str = $wechatPay->getXcxOrder($appid, $prepay_ver['data']);
+            //支付成功或添加账单明细
+            return responseSuccess($str);
+
+        } else {
+            return responseError('订单不对,数据库无数据');
+        }
+    }
 
 }
