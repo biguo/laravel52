@@ -18,6 +18,11 @@ class Member extends Authenticatable implements JWTSubject
         return $this->hasMany(Order::class, 'mid');
     }
 
+    public function unPayOrders()
+    {
+        return $this->orders()->where('status', Status_UnPay)->get();
+    }
+
     //根据用户第三方登陆信息获取用户信息
     public static function getMemberOautch($where)
     {

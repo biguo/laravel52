@@ -27,16 +27,16 @@ class OrderController extends BaseController
         }
         // 接受全部的参数
         $inputs = $request->all();
-        if(!isset($inputs['product_id'])){
+        if (!isset($inputs['product_id'])) {
             return responseError('请输入产品id');
         }
+        $member = Member::getMemberById($mid);
+        if (count($member->unPayOrders()) > 0) {
+            return responseError('有未支付的订单');
+        }
         $inputs['mid'] = $mid;
-
-//        return
-            (new Order())->AddOrder($inputs);
+        return (new Order())->AddOrder($inputs);
     }
-
-
 
 
 }
