@@ -41,6 +41,9 @@ $api->version('v1', ['namespace' => 'App\Api\Controllers'], function ($api) {
     $api->any('product/orderShowBefore', 'ProductController@orderShowBefore');  //下单前页面
 
     $api->post('order/addOrder', 'OrderController@addOrder');  //下单
+    $api->post('order/doPay', 'OrderController@doPay');  //付款
+    $api->any('order/orderWxpaynotify', 'OrderController@orderWxpaynotify');//订单回调地址
+
 
 
 });

@@ -50,34 +50,12 @@ class Member extends Authenticatable implements JWTSubject
 
     public static function getMemberById($mid)
     {
-        return Member::where('id', $mid)->first();
+        return self::where('id', $mid)->first();
     }
 
     public static function getMemberByPhone($phone)
     {
-        return Member::where('phone', $phone)->first();
-    }
-
-    //修改用户信息
-    public static function updateMemberInfo($data)
-    {
-        $mid = intval(@$data['id']);
-        $upfield = array(
-            'phone',
-            'nickname',
-            'idcardno',
-            'headpic',
-            'verstatus',
-            'cardfront',
-            'cardback'
-        );
-        $update = array();
-        foreach ($data as $k => $v) {
-            if (in_array($k, $upfield)) {
-                $update[$k] = $v;
-            }
-        }
-        return DB::table('member')->where('id', $mid)->update($update);
+        return self::where('phone', $phone)->first();
     }
 
     /**

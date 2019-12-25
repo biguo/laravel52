@@ -4,6 +4,7 @@ namespace App\Api\Controllers;
 
 use App\Models\Country;
 use App\Models\Member;
+use App\Models\MemberOauth;
 use App\Models\Order;
 use Illuminate\Http\Request;
 
@@ -49,31 +50,55 @@ class OrderController extends BaseController
             if (!$mid) {
                 return responseError('请登录');
             }
-            $all = $request->all(); // 获取所有的传参
-            if (!isset($all['tradeno'])) { // 订单号是否为空
+            $all = $request->all();
+            if (!$all['trade_no']) {
                 return responseError("订单号为空!!!");
             }
-            if(!isset($all['total'])){
+            if (!$all['total']) {
                 return responseError('请输入总价');
             }
-            $all['mid'] = $mid;
-            //验证订单是否可以支付
-            $order = Order::where('tradeno',$all['tradeno'])->first();
-            // 检查用户的价格是否正确
-            $price = $order->checkPrice($all['total'], $all['tradeno']);
-//            $price = DB::table("order")->where([["tradeno", "=", $tradeno]])->value('price');
-            if (!$price['flag']) {
-                return responseError($price['msg']);
-            }
-            $appid = DB::table('shop')->where('id', $order->shop_id)->value('appid');
-            // 进行订单的支付 -- 没有问题进行支付
-            $result = $order->dopay($appid, $all['tradeno'], $all['mid']); // 支付成功
+
+            $appId = Country::current()->appid;  //
+            $result = Order::doPay($appId, $all['total'], $mid); // 支付成功
             return $result;
 //            return responseSuccess();
         } else {
             return responseError("不是post请求!!");
         }
 
+    }
+
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     *    {"appid":"wxd89dc01c5901c873",
+     *     "bank_type":"CFT",
+     *    "cash_fee":"1",
+     *    "fee_type":"CNY",
+     *    "is_subscribe":"N",
+     *    "mch_id":"1487769092",
+     *    "nonce_str":"iZhh3vtKc1KXIAWkmi8n6zVq4M3Ehri9",
+     *    "openid":"ocaf_0YXGW2U1wdVWo2LQCGyOkow",
+     *    "out_trade_no":"HOME2018032131226",
+     *    "result_code":"SUCCESS",
+     *    "return_code":"SUCCESS",
+     *    "sign":"F2DAE8D01E727D8F7BC263B89C9A8906",
+     *    "time_end":"20180321163918",
+     *    "total_fee":"1",
+     *    "trade_type":"APP",
+     *    "transaction_id":"4200000096201803212842821207"}
+     */
+    // 订单的Wxpay的回调地址
+    public function orderWxpaynotify()
+    {
+        $response = simplexml_load_string(file_get_contents("php://input"), 'SimpleXMLElement', LIBXML_NOCDATA);
+
+        if ($response === false) {
+            return responseError('parse xml error！');
+        }
+        if ($response->return_code != 'SUCCESS') {
+            return responseError('支付失败(' . $response->err_code . '):' . $response->return_msg);
+        }
+        return (new Order())->orderWxpaynotify($response);
     }
 
 

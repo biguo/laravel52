@@ -77,7 +77,7 @@ class MemberController extends BaseController
                     return responseError('注册失败', $data);
                 }
 
-                $oauth = MemberOauth::addMemberOauth($data, $mid);
+                $oauth = MemberOauth::addMemberOauth($data['uid'], $mid);
                 if ($oauth['report'] == 'fail') {
                     DB::rollback(); //事务回滚
                     return responseError($oauth['msg'], $data);
@@ -85,9 +85,9 @@ class MemberController extends BaseController
                 DB::commit();
             } else {
                 $mid = $member->id;
-                $memberAuth = MemberOauth::getXcxMemberOauth($data, $mid);
+                $memberAuth = MemberOauth::getXcxMemberOauth($data['uid'], $mid);
                 if (!$memberAuth) {
-                    MemberOauth::addMemberOauth($data, $mid);
+                    MemberOauth::addMemberOauth($data['uid'], $mid);
                 }
             }
 

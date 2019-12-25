@@ -12,9 +12,9 @@ class MemberOauth extends Model
     public $timestamps = false;
 
 
-    public static function addMemberOauth($data, $mid)
+    public static function addMemberOauth($openid, $mid)
     {
-        $data = ['mid' => $mid, 'openid' => $data['uid']];
+        $data = ['mid' => $mid, 'openid' => $openid];
         //判断登陆关系是否已存在
         $num = self::where($data)->count();
         if ($num > 0)
@@ -27,9 +27,14 @@ class MemberOauth extends Model
         }
     }
 
-    public static function getXcxMemberOauth($data, $mid)
+    public static function getXcxMemberOauth($openid, $mid)
     {
-        return self::where(['mid' => $mid, 'openid' => $data['uid']])->first();
+        return self::where(['mid' => $mid, 'openid' => $openid])->first();
+    }
+
+    public static function getMemberOauthByMid($mid)
+    {
+        return self::where('mid', $mid)->first();
     }
 
 }
