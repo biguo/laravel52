@@ -26,6 +26,9 @@ class ProductController extends BaseController
     {
         if($request->isMethod('GET')) {
             $mid = $this->checkLogin($request);
+            if (!$mid) {
+                return responseError('请登录');
+            }
             $data['left'] = Member::getMemberById($mid)->leftamount;
             $data['product'] = Country::current()->usedProduct();
             return responseSuccess($data);

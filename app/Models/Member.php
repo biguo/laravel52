@@ -13,6 +13,10 @@ class Member extends Authenticatable implements JWTSubject
     protected $primaryKey = 'id'; //指定id
     public $timestamps = false;
 
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'mid');
+    }
 
     //根据用户第三方登陆信息获取用户信息
     public static function getMemberOautch($where)

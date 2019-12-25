@@ -48,4 +48,8 @@ class Country extends Model
             ->orderBy('sort', 'asc')->get();
     }
 
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
 }

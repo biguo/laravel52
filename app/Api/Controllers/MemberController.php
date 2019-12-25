@@ -17,13 +17,13 @@ class MemberController extends BaseController
     {
         if ($request->isMethod('GET')) {
             $mid = $this->checkLogin($request);
-            $result = Member::getMemberById($mid);
-            if (!$result)
-                $array = array();
-            else {
-                $array = $result->toarray();
-                $array = array_only($array, ['id', 'phone', 'headpic', 'nickname']);
+            if (!$mid) {
+                return responseError('请登录');
             }
+            $member = Member::getMemberById($mid);
+            $array = array();
+            if ($member)
+                $array = array_only($member->toarray(), ['id', 'phone', 'headpic', 'nickname']);
             return responseSuccess($array);
         }
         return responseError('非法请求');
@@ -36,23 +36,20 @@ class MemberController extends BaseController
             if (!isset($data['uid']) || empty($data['uid'])) {
                 return responseError('uid没传');
             }
-            $minfo = Member::getMemberOautch(array('o.openid' => $data['uid']));
+            $member = Member::getMemberOautch(array('o.openid' => $data['uid']));
             $country_id = Country::current()->id;
 
-            if ($minfo) {
-                $member = $minfo->toarray();
-                Redis::set('country:openid:' . $member['id'], $data['uid']);  //指定当前的用户在哪个村的小程序
+            $return['country_id'] = $country_id;
+            $return['exist'] = 0;
 
-                $member['jwttoken'] = $this->JwtEncryption($minfo);
-                $member['introducer'] = DB::table('member as m')->where('id', $member['pid'])->value('nickname');
-                $member['country_id'] = $country_id;
-                $member['exist'] = 1;
-                return responseSuccess($member);
-            } else {
-                $return['country_id'] = $country_id;
-                $return['exist'] = 0;
-                return responseSuccess($return);
+            if ($member) {
+                $return = $member->toarray();
+                Redis::set('country:openid:' . $return['id'], $data['uid']);  //指定当前的用户在哪个村的小程序
+
+                $return['jwttoken'] = $this->JwtEncryption($member);
+                $return['exist'] = 1;
             }
+            return responseSuccess($return);
         } else
             return responseError('非法请求');
     }
