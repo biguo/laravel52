@@ -4,12 +4,26 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Input;
 
 class Country extends Model
 {
     protected $table = 'country';
 
     public $timestamps = false;
+
+    /**
+     * 根据参数搜索当前乡村项目
+     * @param null $slug
+     * @return mixed
+     */
+    public static function current($slug = null)
+    {
+        if (!$slug) {
+            $slug = Input::get('slug');
+        }
+        return self::where('slug', $slug)->first();
+    }
 
     public function banners()
     {
@@ -19,6 +33,18 @@ class Country extends Model
     public function usedBanner()
     {
         return $this->banners()->where('status', Status_Online)->select('id', 'title', DB::raw("concat('" . Upload_Domain . "', image) as image"), 'sort', 'content')
+            ->orderBy('sort', 'asc')->get();
+    }
+
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
+
+    public function usedProduct()
+    {
+        return $this->products()->where('status', Status_Online)
+            ->select('id', 'title','price',DB::raw("concat('" . Upload_Domain . "', image) as image"),'single','whole','coffee','wine','cake','sort', 'content')
             ->orderBy('sort', 'asc')->get();
     }
 

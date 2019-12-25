@@ -38,5 +38,7 @@ $api->version('v1', ['namespace' => 'App\Api\Controllers'], function ($api) {
 
     $api->any('banner/list', 'BannerController@getList');  //lbt
 
+    $api->any('product/orderShowBefore', 'ProductController@orderShowBefore');  //lbt
+
 });
 

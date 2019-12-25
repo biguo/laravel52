@@ -2,6 +2,7 @@
 
 namespace App\Api\Controllers;
 
+use App\Models\Country;
 use App\Models\Member;
 use App\Models\MemberOauth;
 use Illuminate\Http\Request;
@@ -36,7 +37,7 @@ class MemberController extends BaseController
                 return responseError('uid没传');
             }
             $minfo = Member::getMemberOautch(array('o.openid' => $data['uid']));
-            $country_id = DB::table('country')->where('slug', $data['slug'])->value('id');
+            $country_id = Country::current()->id;
 
             if ($minfo) {
                 $member = $minfo->toarray();
@@ -109,7 +110,7 @@ class MemberController extends BaseController
             if (empty($data['code'])) {
                 return responseError('必传字段为空');
             }
-            $country = DB::table('country')->where('slug', $data['slug'])->first();
+            $country = Country::current();
             $curl = curl_init();
             //使用curl_setopt() 设置要获得url地址
             $url = "https://api.weixin.qq.com/sns/jscode2session?appid=$country->appid&secret=$country->appsecret&js_code=" . $data['code'] . '&grant_type=authorization_code';
