@@ -99,9 +99,10 @@ class Order extends Model
                 return responseError('获取预支付订单失败');
             }
 
-            $str = $weChatPay->getXcxOrder($appId, $prepay_ver['data']);
+            $data['str'] = $weChatPay->getXcxOrder($appId, $prepay_ver['data']);
+            $data['leftamount'] = Member::getMemberById($mid)->leftamount;
             //支付成功或添加账单明细
-            return responseSuccess($str);
+            return responseSuccess($data);
         } else {
             return responseError('订单不对,数据库无数据');
         }
