@@ -37,7 +37,7 @@ class Order extends Model
         }
 
         $where = [['trade_no', '=', $trade_no]];
-        if ($status !== '0') {
+        if ($status !== 0) {
             array_push($where, ["status", "=", $status]);
         }
         return self::where($where)->first();
@@ -80,7 +80,7 @@ class Order extends Model
         $Order = Order::getOrderByTradeNo();
         if ($Order) { // 订单可以进行支付
             $appId = $Order->country()->first()->appid;
-            if (sprintf("%.2f",$Order->price) !== sprintf("%.2f",$total)) {
+            if (sprintf("%.2f", $Order->price) !== sprintf("%.2f", $total)) {
                 return responseError('最终价格不一样');
             }
 
@@ -99,7 +99,7 @@ class Order extends Model
                 return responseError('获取预支付订单失败');
             }
 
-            $data['str'] = $weChatPay->getXcxOrder($appId, $prepay_ver['data']);
+            $data['paydata'] = $weChatPay->getXcxOrder($appId, $prepay_ver['data']);
             $data['leftamount'] = Member::getMemberById($mid)->leftamount;
             //支付成功或添加账单明细
             return responseSuccess($data);
@@ -128,15 +128,26 @@ class Order extends Model
      */
     public function orderWxpaynotify($object)
     {
-        $order = Order::getOrderByTradeNo($object->out_trade_no);
-        // 下面进行判断 -- 是否支付成功
+
+        $order = Order::getOrderByTradeNo($object->out_trade_no, 0);  //调试完  把第二个参数去掉
+
         if ($order) {
+            DB::beginTransaction();
             $order->status = Status_Payed;
             $order->paytradeno = $object->transaction_id;
             $order->responsestr = json_encode($object);
             $order->paytime = $object->time_end;
-            $order->save();
-            return responseSuccess("支付成功");
+            $save = $order->save();
+            $array = array_only(array_merge($order->toarray(), object_array($object)), ['trade_no', 'title', 'mid', 'total_fee', 'country_id']);
+            $record = AccountRecord::create($array);
+            $increment = Member::getMemberById($order->mid)->increment("leftamount", $order->price);
+            if ($save && $record && $increment) {
+                DB::commit();
+                return responseSuccess("支付成功");
+            } else {
+                DB::rollback();
+                return responseSuccess("支付失败");
+            }
         }
         return responseError('订单不对,数据库无数据');
 

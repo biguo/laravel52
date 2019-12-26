@@ -27,13 +27,30 @@ function test_function()
 }
 
 //生成唯一订单号
-function StrOrderOne(){
+function StrOrderOne()
+{
     return date('Ymd') . str_pad(mt_rand(1, 99999), 5, '0', STR_PAD_LEFT);
 }
+
+//对象转数组
+function object_array($array)
+{
+    if (is_object($array)) {
+        $array = (array)$array;
+    }
+    if (is_array($array)) {
+        foreach ($array as $key => $value) {
+            $array[$key] = object_array($value);
+        }
+    }
+    return $array;
+}
+
 /**
  *  这个比上面那个好用
  */
-function doCurlPostRequest($url, $requestString, $headertype = '', $timeout = 10) {
+function doCurlPostRequest($url, $requestString, $headertype = '', $timeout = 10)
+{
     if ($url == "" || $requestString == "" || $timeout <= 0) {
         return false;
     }
@@ -62,10 +79,10 @@ function doCurlPostRequest($url, $requestString, $headertype = '', $timeout = 10
  * @param type $force
  * @return boolean
  */
-function gettoken($appid, $force = false) {
-
+function gettoken($appid, $force = false)
+{
     $redis = \Illuminate\Support\Facades\Redis::connection('default');
-    $cachename = 'wx_accesstoken:'.$appid;
+    $cachename = 'wx_accesstoken:' . $appid;
     $token = $redis->get($cachename);
     if ($force || empty($token)) {
         //微信接口取accesstoken
@@ -84,7 +101,7 @@ function gettoken($appid, $force = false) {
         $token = $retData['access_token'];
         $expire = $retData['expires_in'];
         //保存到缓存
-        $redis->setex($cachename,$expire, $token);
+        $redis->setex($cachename, $expire, $token);
     }
     return $token;
 }
@@ -95,7 +112,8 @@ function gettoken($appid, $force = false) {
  * @param type $data
  * @return boolean
  */
-function postWeixinInterface($interface, $data, $appid) {
+function postWeixinInterface($interface, $data, $appid)
+{
     $token = gettoken($appid);
     $url = $interface . "?access_token=" . $token;
     $json_data = JSON($data);
@@ -108,7 +126,8 @@ function postWeixinInterface($interface, $data, $appid) {
  * @param type $array
  * @return type
  */
-function JSON($array) {
+function JSON($array)
+{
     arrayRecursive($array, 'urlencode', true);
     $json = json_encode($array);
     return urldecode($json);
@@ -121,7 +140,8 @@ function JSON($array) {
  * @param type $function
  * @param type $apply_to_keys_also
  */
-function arrayRecursive(&$array, $function1, $apply_to_keys_also = false) {
+function arrayRecursive(&$array, $function1, $apply_to_keys_also = false)
+{
     static $recursive_counter = 0;
     if (++$recursive_counter > 1000) {
         die('possible deep recursion attack');
