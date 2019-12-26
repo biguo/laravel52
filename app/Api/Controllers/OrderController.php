@@ -40,6 +40,7 @@ class OrderController extends BaseController
     }
 
     /**
+     * 付款
      * @return \Illuminate\Http\JsonResponse
      */
     public function doPay(Request $request)
@@ -58,10 +59,7 @@ class OrderController extends BaseController
                 return responseError('请输入总价');
             }
 
-            $appId = Country::current()->appid;  //
-            $result = Order::doPay($appId, $all['total'], $mid); // 支付成功
-            return $result;
-//            return responseSuccess();
+            return Order::doPay($all['total'], $mid); // 支付成功
         } else {
             return responseError("不是post请求!!");
         }
@@ -69,6 +67,7 @@ class OrderController extends BaseController
     }
 
     /**
+     * 订单的Wxpay的回调地址
      * @return \Illuminate\Http\JsonResponse
      *    {"appid":"wxd89dc01c5901c873",
      *     "bank_type":"CFT",
@@ -87,7 +86,6 @@ class OrderController extends BaseController
      *    "trade_type":"APP",
      *    "transaction_id":"4200000096201803212842821207"}
      */
-    // 订单的Wxpay的回调地址
     public function orderWxpaynotify()
     {
         $response = simplexml_load_string(file_get_contents("php://input"), 'SimpleXMLElement', LIBXML_NOCDATA);

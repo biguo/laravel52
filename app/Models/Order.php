@@ -75,11 +75,12 @@ class Order extends Model
      * @param $mid
      * @return \Illuminate\Http\JsonResponse
      */
-    public static function doPay($appId, $total, $mid)
+    public static function doPay($total, $mid)
     {
         $Order = Order::getOrderByTradeNo();
         if ($Order) { // 订单可以进行支付
-            if ($Order->price !== $total) {
+            $appId = $Order->country()->first()->appid;
+            if (sprintf("%.2f",$Order->price) !== sprintf("%.2f",$total)) {
                 return responseError('最终价格不一样');
             }
 

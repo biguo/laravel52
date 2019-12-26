@@ -115,7 +115,7 @@ class ProductController extends Controller
             $form->number('coffee', '咖啡券')->rules('required|regex:/^[0-9]\d*$/');
             $form->number('wine', '持卡人生日赠送香槟')->rules('required|regex:/^[0-9]\d*$/');
             $form->number('cake', '持卡人生日送小蛋糕')->rules('required|regex:/^[0-9]\d*$/');
-            $form->ckeditor('content', 'content');
+            $form->text('content', 'content');
             $form->hidden('country_id','country_id')->default($this->country);
             $form->hidden('sort');
             $form->hidden('status');
