@@ -14,6 +14,11 @@ class Product extends Model
         return $this->belongsTo(Country::class);
     }
 
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
     public static function getById($product_id = null)
     {
         if (!$product_id) {

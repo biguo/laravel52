@@ -23,6 +23,10 @@ class Order extends Model
         return $this->belongsTo(Member::class, 'mid');
     }
 
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
 
     /**
      * 根据tradeNo 获得订单   第二个参数表示状态条件 默认只获得未支付的, 0表示所有
@@ -129,8 +133,7 @@ class Order extends Model
     public function orderWxpaynotify($object)
     {
 
-        $order = Order::getOrderByTradeNo($object->out_trade_no, 0);  //调试完  把第二个参数去掉
-
+        $order = Order::getOrderByTradeNo($object->out_trade_no);  //调试完  把第二个参数去掉
         if ($order) {
             DB::beginTransaction();
             $order->status = Status_Payed;
@@ -141,6 +144,7 @@ class Order extends Model
             $array = array_only(array_merge($order->toarray(), object_array($object)), ['trade_no', 'title', 'mid', 'total_fee', 'country_id']);
             $record = AccountRecord::create($array);
             $increment = Member::getMemberById($order->mid)->increment("leftamount", $order->price);
+            $this->prepareCard($order);
             if ($save && $record && $increment) {
                 DB::commit();
                 return responseSuccess("支付成功");
@@ -148,8 +152,30 @@ class Order extends Model
                 DB::rollback();
                 return responseSuccess("支付失败");
             }
+            return responseSuccess($data);
         }
         return responseError('订单不对,数据库无数据');
 
+    }
+
+    public function prepareCard($order)
+    {
+        Card::where('mid', $order->mid)->delete();
+        $orderArr = $order->toarray();
+        $info = array_only($orderArr, ['mid', 'country_id']);
+
+        $CardTypeArray = ['single' => '入住9折（单间）邀请券', 'whole' => '整栋8.5折入住券', 'coffee' => '咖啡券'];
+        foreach ($orderArr as $key => $value) {
+            if (isset($CardTypeArray[$key]) && ($CardType = $CardTypeArray[$key]) && ($value > 0)) {
+                for ($i = 1; $i <= $value; $i++) {
+                    $info['code'] = 'USE' . StrOrderOne();
+                    $info['title'] = $CardType;
+                    Card::create($info);
+                }
+            }
+        }
+        $info['status'] = Status_Used;
+        $info['title'] = $order->title;
+        Card::create($info);
     }
 }
