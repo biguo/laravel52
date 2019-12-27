@@ -11,7 +11,7 @@ use Tools\Pay\Wechatpay;
 class Order extends Model
 {
     protected $table = 'order';
-    protected $fillable = ['title', 'price', 'image', 'country_id', 'product_id', 'mid', 'trade_no', 'single', 'whole', 'coffee', 'wine', 'cake'];
+    protected $fillable = ['title', 'price', 'image','icon', 'country_id', 'product_id', 'mid', 'trade_no', 'single', 'whole', 'coffee', 'wine', 'cake'];
 
     public function country()
     {
@@ -57,7 +57,7 @@ class Order extends Model
             if (number_format($product->price, 2) != number_format($all['total'], 2)) {
                 return responseError("计算金额不对");
             }
-            $data = array_only($product->toarray(), ['title', 'price', 'image', 'country_id', 'single', 'whole', 'coffee', 'wine', 'cake']);
+            $data = array_only($product->toarray(), ['title', 'price', 'image','icon', 'country_id', 'single', 'whole', 'coffee', 'wine', 'cake']);
             $all = array_except($all, ['total']);
             $data = array_merge($data, $all);
             $data['trade_no'] = 'Add' . StrOrderOne();
@@ -167,10 +167,10 @@ class Order extends Model
         $levelArray = [
             'type' => 'level',
             'category' => 'level',
-            'info' => Upload_Domain . $order->image,
+            'info' => json_encode(['image' => Upload_Domain . $order->image, 'icon' => Upload_Domain . $order->icon]),
             'description' => $order->title,
             'status' => Status_Used,
-            'code' => ''
+            'code' => 'VIP' . StrOrderOne()
         ];
         $CardTypeArray = [
             'single' => [

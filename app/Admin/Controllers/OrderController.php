@@ -72,7 +72,7 @@ class OrderController extends Controller
     protected function grid()
     {
         return Admin::grid(Order::class, function (Grid $grid) {
-
+            $grid->model()->where('country_id',$this->country)->orderBy('status', 'desc')->orderBy('id', 'desc');
             $statusArr = [
                 '1' => '待支付',
                 '2' => '已支付',
@@ -81,8 +81,10 @@ class OrderController extends Controller
             $grid->disableCreation();
             $grid->id('ID')->sortable();
 
+            $grid->trade_no();
             $grid->title();
-            $grid->image();
+            $grid->price();
+            $grid->image()->image(Upload_Domain, 100, 100);
             $grid->column('status', '状态')->display(function ($status) use($statusArr){
                 return $statusArr[$status];
             });
@@ -97,6 +99,9 @@ class OrderController extends Controller
 //                    $query->where('title', 'like', "%{$this->input}%")
 //                        ->orWhere('content', 'like', "%{$this->input}%");
 //                }, 'Search');
+            });
+            $grid->actions(function ($actions) {
+                $actions->disableEdit();
             });
         });
     }

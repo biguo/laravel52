@@ -31,6 +31,13 @@ class MemberController extends BaseController
             if ($member)
                 $array = array_only($member->toarray(), ['id', 'phone', 'headpic', 'nickname', 'description', 'point', 'leftamount']);
             $array['cardNum'] = count($member->cards);
+            $card = $member->cards()->where('type','level')->first();
+            if($card){
+                $info = json_decode($card->info, true);
+                $array['icon'] = $info['icon'];
+            }else{
+                $array['icon'] = Default_Icon;
+            }
             return responseSuccess($array);
         }
         return responseError('非法请求');

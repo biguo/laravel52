@@ -78,6 +78,7 @@ class ProductController extends Controller
             $grid->id('ID')->sortable();
             $grid->title()->editable();
             $grid->image()->image(Upload_Domain, 100, 100);
+            $grid->column('icon','图标')->image(Upload_Domain, 30, 30);
             $grid->price()->editable();
             $grid->filter(function ($filter) {
 //                $filter->useModal();
@@ -109,6 +110,7 @@ class ProductController extends Controller
             $form->display('id', 'ID');
             $form->text('title', 'title')->rules('required|min:3');
             $form->image('image', 'image');
+            $form->image('icon', 'icon');
             $form->number('price', 'price')->rules('required|regex:/^[1-9]\d*(\.\d+)?$/');  //大于1的正数
             $form->number('single', '单间9折入住券')->rules('required|regex:/^[0-9]\d*$/');  //非负整数
             $form->number('whole', '整栋8.5折入住券')->rules('required|regex:/^[0-9]\d*$/');

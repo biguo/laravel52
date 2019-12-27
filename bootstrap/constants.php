@@ -16,6 +16,7 @@ define('Status_UnUse',0);//未使用
 define('Status_Used',1);//已使用
 
 define('Upload_Domain','http://upload.binghuozhijia.com/');//七牛
+define('Default_Icon','http://upload.binghuozhijia.com/image/icon.png');//默认等级
 define('Default_Pic','http://bhzj.binghuozhijia.com/test/bhzj/public/sample/default_pic.png');//默认头像
 
 
