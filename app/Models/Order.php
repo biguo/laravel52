@@ -170,7 +170,8 @@ class Order extends Model
             'info' => json_encode(['image' => Upload_Domain . $order->image, 'icon' => Upload_Domain . $order->icon]),
             'description' => $order->title,
             'status' => Status_Used,
-            'code' => 'VIP' . StrOrderOne()
+            'code' => 'VIP' . StrOrderOne(),
+            'expired_at' => date('Y-m-d H:i:s',strtotime(" +1 year"))
         ];
         $CardTypeArray = [
             'single' => [
@@ -195,6 +196,7 @@ class Order extends Model
                 for ($i = 1; $i <= $value; $i++) {
                     $info = array_merge($info, $CardType);
                     $info['code'] = 'USE' . StrOrderOne();
+                    $info['expired_at'] = date('Y-m-d H:i:s',strtotime(" +1 year"));
                     Card::create($info);
                 }
             }
