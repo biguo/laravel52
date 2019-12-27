@@ -55,7 +55,7 @@ class MemberController extends BaseController
             if (!$mid) {
                 return responseError('请登录');
             }
-            $object = DB::table('card')->where('mid', $mid)->select(DB::raw('count(id) as count'), 'code','info', 'type', 'category', 'description')->groupBy('category')->groupBy('type')->get();
+            $object = DB::table('card')->where('mid', $mid)->where('status', Status_UnUse)->select(DB::raw('count(id) as count'), 'code','info', 'type', 'category', 'description')->groupBy('category')->groupBy('type')->get();
             $array = object_array($object);
             $sorted = [];
             foreach ($array as $item) {

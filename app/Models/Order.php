@@ -169,7 +169,6 @@ class Order extends Model
             'category' => 'level',
             'info' => json_encode(['image' => Upload_Domain . $order->image, 'icon' => Upload_Domain . $order->icon]),
             'description' => $order->title,
-            'status' => Status_Used,
             'code' => 'VIP' . StrOrderOne(),
             'expired_at' => date('Y-m-d H:i:s',strtotime(" +1 year"))
         ];
