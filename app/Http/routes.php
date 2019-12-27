@@ -31,6 +31,8 @@ $api->version('v1', ['namespace' => 'App\Api\Controllers'], function ($api) {
     $api->any('member/wxRegister', 'MemberController@wxRegister');//小程序用户注册
     $api->any('member/getOpenid', 'MemberController@getOpenid');//小程序获取openid
     $api->any('member/minfo', 'MemberController@minfo');// 我的信息
+    $api->any('member/cards', 'MemberController@cards');// 我的卡券
+    $api->any('member/useVoucher', 'MemberController@useVoucher');// 使用代金券
 
     $api->any('common/getSmsCode', 'CommonController@getSmsCode'); //验证码
     $api->any('common/shareXcx', 'CommonController@shareXcx');  // 分享二维码

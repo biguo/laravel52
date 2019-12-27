@@ -1,4 +1,5 @@
 <?php
+use Illuminate\Support\Facades\DB;
 
 //api接口返回成功
 function responseSuccess($data = array(), $message = '操作成功', $code = '200')
@@ -21,9 +22,10 @@ function responseErrorArr($message = '操作失败', $data = array(), $code = '5
     return ['report' => 'fail', 'code' => $code, 'data' => $data, 'msg' => $message, 'action' => 'ACTION_NONE'];
 }
 
-function test_function()
+function getSql()
 {
-    return 'test_function';
+    DB::enableQueryLog();
+    print_r(DB::getQueryLog());
 }
 
 //生成唯一订单号

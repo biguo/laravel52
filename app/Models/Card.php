@@ -7,10 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 class Card extends Model
 {
     protected $table = 'card';
-    protected $fillable = ['title', 'code', 'mid', 'country_id', 'status'];
+    protected $fillable = ['code', 'mid', 'country_id', 'status', 'info', 'type', 'description', 'category'];
 
     public function country()
     {
         return $this->belongsTo(Country::class);
+    }
+
+    public function member()
+    {
+        return $this->belongsTo(Member::class, 'mid');
     }
 }

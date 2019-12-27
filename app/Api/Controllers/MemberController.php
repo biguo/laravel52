@@ -2,6 +2,7 @@
 
 namespace App\Api\Controllers;
 
+use App\Models\Card;
 use App\Models\Country;
 use App\Models\Member;
 use App\Models\MemberOauth;
@@ -13,6 +14,11 @@ use Tools\SmsCode\SmsCode;
 class MemberController extends BaseController
 {
 
+    /**
+     * 我的个人信息
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function minfo(Request $request)
     {
         if ($request->isMethod('GET')) {
@@ -23,12 +29,70 @@ class MemberController extends BaseController
             $member = Member::getMemberById($mid);
             $array = array();
             if ($member)
-                $array = array_only($member->toarray(), ['id', 'phone', 'headpic', 'nickname']);
+                $array = array_only($member->toarray(), ['id', 'phone', 'headpic', 'nickname', 'description', 'point', 'leftamount']);
+            $array['cardNum'] = count($member->cards);
             return responseSuccess($array);
         }
         return responseError('非法请求');
     }
 
+    /**
+     * 个人卡券列表
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function cards(Request $request)
+    {
+        if ($request->isMethod('GET')) {
+            $mid = $this->checkLogin($request);
+            if (!$mid) {
+                return responseError('请登录');
+            }
+            $object = DB::table('card')->where('mid', $mid)->select(DB::raw('count(id) as count'), 'info', 'type', 'category', 'description')->groupBy('category')->groupBy('type')->get();
+            $array = object_array($object);
+            $sorted = [];
+            foreach ($array as $item) {
+                if (!isset($sorted[$item['category']])) {
+                    $sorted[$item['category']] = [];
+                }
+                array_push($sorted[$item['category']], $item);
+            }
+            return responseSuccess($sorted);
+        }
+        return responseError('非法请求');
+    }
+
+
+    /**
+     * 使用代金券
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function useVoucher(Request $request)
+    {
+        if ($request->isMethod('POST')) {
+            $mid = $this->checkLogin($request);
+            if (!$mid) {
+                return responseError('请登录');
+            }
+            $data = $request->all();
+            $data['status'] = Status_UnUse;
+            $data['mid'] = $mid;
+            $card = Card::where($data)->first();
+            if (!$card)
+                return responseError('没有符合条件的卡');
+            $card->status = Status_Used;
+            $card->save();
+            return responseSuccess($card->code);
+        } else
+            return responseError('非法请求');
+    }
+
+    /**
+     * 登录
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function wxLogin(Request $request)
     {
         if ($request->isMethod('POST')) {
@@ -54,6 +118,11 @@ class MemberController extends BaseController
             return responseError('非法请求');
     }
 
+    /**
+     * 绑定注册
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function wxRegister(Request $request)
     {
         if ($request->isMethod('POST')) {
@@ -100,6 +169,11 @@ class MemberController extends BaseController
     }
 
 
+    /**
+     * 获得唯一标识openid
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getOpenid(Request $request)
     {
         if ($request->isMethod('POST')) {

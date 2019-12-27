@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Input;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Foundation\Auth\User as Authenticatable ;
 
@@ -21,6 +22,11 @@ class Member extends Authenticatable implements JWTSubject
     public function unPayOrders()
     {
         return $this->orders()->where('status', Status_UnPay)->get();
+    }
+
+    public function cards()
+    {
+        return $this->hasMany(Card::class, 'mid');
     }
 
     //根据用户第三方登陆信息获取用户信息

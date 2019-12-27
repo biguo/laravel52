@@ -164,18 +164,42 @@ class Order extends Model
         $orderArr = $order->toarray();
         $info = array_only($orderArr, ['mid', 'country_id']);
 
-        $CardTypeArray = ['single' => '入住9折（单间）邀请券', 'whole' => '整栋8.5折入住券', 'coffee' => '咖啡券'];
+        $levelArray = [
+            'type' => 'level',
+            'category' => 'level',
+            'info' => Upload_Domain . $order->image,
+            'description' => $order->title,
+            'status' => Status_Used,
+            'code' => ''
+        ];
+        $CardTypeArray = [
+            'single' => [
+                'type' => 'single',
+                'category' => 'discount',
+                'info' => '9',
+                'description' => '单间入住折扣券'
+            ],
+            'whole' => ['type' => 'whole',
+                'category' => 'discount',
+                'info' => '8.5',
+                'description' => '整栋入住折扣券'
+            ],
+            'coffee' => ['type' => 'coffee',
+                'category' => 'voucher',
+                'info' => '咖啡代金券',
+                'description' => '冯梦龙咖啡厅'
+            ]
+        ];
         foreach ($orderArr as $key => $value) {
             if (isset($CardTypeArray[$key]) && ($CardType = $CardTypeArray[$key]) && ($value > 0)) {
                 for ($i = 1; $i <= $value; $i++) {
+                    $info = array_merge($info, $CardType);
                     $info['code'] = 'USE' . StrOrderOne();
-                    $info['title'] = $CardType;
                     Card::create($info);
                 }
             }
         }
-        $info['status'] = Status_Used;
-        $info['title'] = $order->title;
+        $info = array_merge($info, $levelArray);
         Card::create($info);
     }
 }
