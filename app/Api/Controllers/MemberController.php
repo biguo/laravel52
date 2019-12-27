@@ -55,12 +55,16 @@ class MemberController extends BaseController
             if (!$mid) {
                 return responseError('请登录');
             }
-            $object = DB::table('card')->where('mid', $mid)->select(DB::raw('count(id) as count'), 'info', 'type', 'category', 'description')->groupBy('category')->groupBy('type')->get();
+            $object = DB::table('card')->where('mid', $mid)->select(DB::raw('count(id) as count'), 'code','info', 'type', 'category', 'description')->groupBy('category')->groupBy('type')->get();
             $array = object_array($object);
             $sorted = [];
             foreach ($array as $item) {
                 if (!isset($sorted[$item['category']])) {
                     $sorted[$item['category']] = [];
+                }
+                if($item['category'] === 'level'){
+                    $info = json_decode($item['info'], true);
+                    $item['info'] = $info['image'];
                 }
                 array_push($sorted[$item['category']], $item);
             }

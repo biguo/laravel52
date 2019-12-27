@@ -10,6 +10,7 @@ use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\ModelForm;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -72,16 +73,15 @@ class OrderController extends Controller
     protected function grid()
     {
         return Admin::grid(Order::class, function (Grid $grid) {
-            $grid->model()->where('country_id',$this->country)->orderBy('status', 'desc')->orderBy('id', 'desc');
-            $statusArr = [
-                '1' => '待支付',
-                '2' => '已支付',
-                '4' => '已取消'
-            ];
+            $grid->model()->from('order as o')->leftJoin('member as m','m.id','=','o.mid')->select('m.phone','o.*')
+                ->where('o.country_id',$this->country)->orderBy('o.status', 'desc')->orderBy('o.id', 'desc');
+
+            $statusArr = ['1' => '待支付','2' => '已支付','4' => '已取消'];
             $grid->disableCreation();
             $grid->id('ID')->sortable();
 
             $grid->trade_no();
+            $grid->column('phone','用户手机号');
             $grid->title();
             $grid->price();
             $grid->image()->image(Upload_Domain, 100, 100);
