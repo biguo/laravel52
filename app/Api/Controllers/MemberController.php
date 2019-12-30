@@ -100,6 +100,25 @@ class MemberController extends BaseController
     }
 
     /**
+     * 充值记录
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function rechargeList(Request $request)
+    {
+        if ($request->isMethod('GET')) {
+            $mid = $this->checkLogin($request);
+            if (!$mid) {
+                return responseError('请登录');
+            }
+            $object = DB::table('account_record')->where('mid', $mid)->where('change', Change_Recharge)->orderBy('created_at','desc')->get();
+            return responseSuccess($object);
+        }
+        return responseError('非法请求');
+    }
+
+
+    /**
      * 登录
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
