@@ -115,6 +115,7 @@ class BannerController extends Controller
             $form->display('id', 'ID');
             $form->text('title', 'title')->rules('required|min:3');
             $form->text('subtitle', 'subtitle')->rules('required|min:3');
+            $form->text('subtitle1', 'subtitle')->placeholder('副标题第二行')->rules('min:3');
             $form->text('description', 'description')->rules('required|min:3');
             $form->image('image', 'image');
             $form->image('bigImage', '长图');

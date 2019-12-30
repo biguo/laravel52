@@ -4,6 +4,7 @@ namespace App\Admin\Controllers;
 
 use App\Models\Order;
 
+use Encore\Admin\Auth\Database\Administrator;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Facades\Admin;
@@ -93,7 +94,13 @@ class OrderController extends Controller
             $grid->filter(function ($filter) {
 //                $filter->useModal();
                 $filter->disableIdFilter();
-                $filter->like('title', 'SearchTitle');
+                $filter->like('title', '名称');
+                $filter->is('status', '状态')->select([
+                    '1' => '待支付',
+                    '2' => '已支付',
+                    '3' => '已取消',
+                ]);
+
 //                $filter->between('created_at', 'Created Time')->datetime();
 //                $filter->where(function ($query) {
 //                    $query->where('title', 'like', "%{$this->input}%")

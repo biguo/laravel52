@@ -27,7 +27,7 @@ class ProductController extends BaseController
             if ($data['cake'] > 0)
                 $str .= "持卡人生日送小蛋糕" . $data['cake'] . "块;";
             $str = rtrim($str,';').'.';
-            $data = array_only($data, ['id','image','icon']);
+            $data = array_only($data, ['id','image','icon','price']);
             $data['description'] = $str;
             $chosen[] = $data;
         }
