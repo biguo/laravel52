@@ -7,6 +7,7 @@ use App\Models\Member;
 use App\Models\MemberOauth;
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Tools\Pay\Wechatpay;
 
 class OrderController extends BaseController
 {
@@ -65,6 +66,31 @@ class OrderController extends BaseController
         }
 
     }
+
+    /**
+     * 退款
+     */
+    public function Refund(Request $request)
+    {
+        if($request->isMethod('POST')) {
+            $trade_no = $request->input('trade_no');
+            $order = Order::getOrderByTradeNo($trade_no,0);
+            if(!$trade_no){
+                return responseError('订单号未传' .$trade_no);
+            }
+            if($order->status === Status_Payed){
+                $code =  (new Wechatpay())->xcxRefundWechat($order->country->appid,$trade_no, $order->price * 100, $order->price*100);
+                if($code === 200){
+                    $order->status = Status_Refund;
+                    $order->save();
+                    return responseSuccessArr('退款成功');
+                }else{
+                    return responseErrorArr('退款失败');
+                }
+            }
+        }
+    }
+
 
     /**
      * 订单的Wxpay的回调地址

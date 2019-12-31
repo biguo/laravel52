@@ -11,6 +11,7 @@ define('Status_Offline',0);//下线
 define('Status_UnPay',1);//订单 未付款
 define('Status_Payed',2);//已付款
 define('Status_Canceled',4);//已取消
+define('Status_Refund',5);//已退款
 
 define('Status_UnUse',0);//代金券 未使用
 define('Status_Used',1);//已使用
