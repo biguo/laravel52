@@ -77,7 +77,7 @@ class OrderController extends Controller
             $grid->model()->from('order as o')->leftJoin('member as m','m.id','=','o.mid')->select('m.phone','o.*')
                 ->where('o.country_id',$this->country)->orderBy('o.status', 'desc')->orderBy('o.id', 'desc');
 
-            $statusArr = ['1' => '待支付','2' => '已支付','4' => '已取消'];
+            $statusArr = ['1' => '待支付','2' => '已支付','4' => '已取消','5' => '已退款'];
             $grid->disableCreation();
             $grid->id('ID')->sortable();
 
@@ -98,7 +98,8 @@ class OrderController extends Controller
                 $filter->is('status', '状态')->select([
                     '1' => '待支付',
                     '2' => '已支付',
-                    '3' => '已取消',
+                    '4' => '已取消',
+                    '5' => '已退款',
                 ]);
 
 //                $filter->between('created_at', 'Created Time')->datetime();
