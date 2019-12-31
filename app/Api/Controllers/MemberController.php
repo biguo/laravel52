@@ -37,10 +37,12 @@ class MemberController extends BaseController
                 $array['icon'] = $info['icon'];
                 $array['level'] = str_replace('会员卡','至尊',$card->description);
                 $array['code'] = $card->code;
+                $array['description'] = $card->description;
             }else{
                 $array['icon'] = Default_Icon;
                 $array['level'] = '普通会员';
                 $array['code'] = '';
+                $array['description'] = '普通会员卡';
             }
             return responseSuccess($array);
         }
