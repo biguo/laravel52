@@ -140,6 +140,13 @@ class MemberController extends BaseController
 
             if ($member) {
                 $return = $member->toarray();
+                $card = $member->cards()->where('type','level')->first();
+                if(!$card){
+                    $card = ['code' => '','description' => '普通会员'];
+                }else{
+                    $card = array_only($card->toarray(),['code','description']);
+                }
+                $return['card'] = $card;
                 Redis::set('country:openid:' . $return['id'], $data['uid']);  //指定当前的用户在哪个村的小程序
 
                 $return['jwttoken'] = $this->JwtEncryption($member);
