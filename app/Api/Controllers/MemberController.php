@@ -36,9 +36,11 @@ class MemberController extends BaseController
                 $info = json_decode($card->info, true);
                 $array['icon'] = $info['icon'];
                 $array['level'] = str_replace('会员卡','至尊',$card->description);
+                $array['code'] = $card->code;
             }else{
                 $array['icon'] = Default_Icon;
                 $array['level'] = '普通会员';
+                $array['code'] = '';
             }
             return responseSuccess($array);
         }
