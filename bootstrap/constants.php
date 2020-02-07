@@ -20,7 +20,7 @@ define('Change_Recharge',1);//记录 充值
 define('Change_Consume',2);//消费
 
 define('Upload_Domain','http://upload.binghuozhijia.com/');//七牛
-define('Default_Icon','http://upload.binghuozhijia.com/image/icon.png');//默认等级
+define('Default_Icon','http://upload.binghuozhijia.com/image/pt.jpg');//默认等级
 define('Default_Pic','http://bhzj.binghuozhijia.com/test/bhzj/public/sample/default_pic.png');//默认头像
 
 

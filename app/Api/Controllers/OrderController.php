@@ -53,10 +53,10 @@ class OrderController extends BaseController
                 return responseError('请登录');
             }
             $all = $request->all();
-            if (!$all['trade_no']) {
+            if (!isset($all['trade_no'])) {
                 return responseError("订单号为空!!!");
             }
-            if (!$all['total']) {
+            if (!isset($all['total'])) {
                 return responseError('请输入总价');
             }
 
