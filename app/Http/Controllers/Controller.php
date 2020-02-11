@@ -23,6 +23,7 @@ class Controller extends BaseController
     {
         $this->request = $request;
         $this->mid = Auth::guard('admin')->user()->id;
+//        $country_id = Country::where('admin_user_id', $this->mid)->value('id');
         $this->country = Country::where('admin_user_id', $this->mid)->value('id');
     }
 

@@ -21,10 +21,21 @@ function responseErrorArr($message = '操作失败', $data = array(), $code = '5
 {
     return ['report' => 'fail', 'code' => $code, 'data' => $data, 'msg' => $message, 'action' => 'ACTION_NONE'];
 }
+/**
+ * 用于自定义Administrator的方法让超级管理员不再无条件看到每个菜单
+ * @param $roles
+ * @return mixed
+ */
+function visible($roles){
+    $id =  Illuminate\Support\Facades\Auth::guard('admin')->user()->id;
+    $admin = \App\Models\CustomerAdmin::find($id);
+    return $admin->visible($roles);
+}
 
-function getSql()
+function getSql(\Closure $callback)
 {
     DB::enableQueryLog();
+    call_user_func($callback);
     print_r(DB::getQueryLog());
 }
 
