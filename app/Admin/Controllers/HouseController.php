@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Extensions\Form\YuntuMap;
 use App\Models\House;
 
 use Encore\Admin\Form;
@@ -12,6 +13,8 @@ use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\ModelForm;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\MessageBag;
+use Illuminate\Validation\Validator;
 
 class HouseController extends Controller
 {
@@ -67,14 +70,27 @@ class HouseController extends Controller
         });
     }
 
-//    public function update($id)
-//    {
-////        return $this->form()->update($id);
-//        $data = Input::all();
-//        print_r($data);
-//
-//
-//        /* @var Model $this->model */
+
+
+    public function update($id)
+    {
+//        return $this->form()->update($id);
+
+        echo "<pre>";
+        $data = Input::all();
+//        $model = $this->form()->model();
+//        print_r($model);
+        print_r($data);
+        exit;
+        if ($validationMessages = $this->validationMessages($data)) {
+            return back()->withInput()->withErrors($validationMessages);
+        }
+
+
+
+
+
+        /* @var Model $this->model */
 //        $this->model = $this->model->with($this->getRelations())->findOrFail($id);
 //
 //        $this->setFieldOriginalValue();
@@ -110,10 +126,10 @@ class HouseController extends Controller
 //        }
 //
 //        return $this->redirectAfterUpdate();
-//
-//
-//
-//    }
+
+        exit;
+
+    }
 
     /**
      * Make a grid builder.
@@ -128,8 +144,6 @@ class HouseController extends Controller
                     ->where('h.country_id', $this->country)
 //                    ->select('h.title', 'h.id')
                     ->orderBy('h.id', 'desc');
-
-
 
             $grid->id('ID')->sortable();
             $grid->column('title', '房源名称')->editable();
@@ -146,27 +160,30 @@ class HouseController extends Controller
     protected function form()
     {
 
-
-        return House::form(House::class, function (Form $form) {
+        return House::form(function (Form $form) {
 
             $form->display('id', 'ID');
             $form->text('title', '标题')->rules('required');
             $form->number('degression', '成本价')->rules('required|regex:/^[1-9]\d*(\.\d+)?$/')->default(0);
             $form->number('hostdayprice', '周末价格')->rules('required|regex:/^[1-9]\d*(\.\d+)?$/')->default(0);  //大于1的正数
             $form->number('roomarea', '房间面积')->rules('required|regex:/^[1-9]\d*(\.\d+)?$/')->default(0);  //大于1的正数
-            $form->number('floor', '建筑总层数')->rules('required|regex:/^[0-9]\d*$/')->default(0);
-            $form->number('livenum', '人数')->rules('required|regex:/^[0-9]\d*$/')->default(0);
-            $form->number('roomnum', '卧室数量')->rules('required|regex:/^[0-9]\d*$/')->default(0);
+            $form->number('floor', '建筑总层数')->rules('required|regex:/^[1-9]\d*$/')->default(0);
+            $form->number('livenum', '人数')->rules('required|regex:/^[1-9]\d*$/')->default(0);
+            $form->number('roomnum', '卧室数量')->rules('required|regex:/^[1-9]\d*$/')->default(0);
             $form->number('hallnum', '客厅数量')->rules('required|regex:/^[0-9]\d*$/')->default(0);
             $form->number('toiletnum', '卫生间数量')->rules('required|regex:/^[0-9]\d*$/')->default(0);  //非负整数
             $form->number('kitchennum', '厨房数量')->rules('required|regex:/^[0-9]\d*$/')->default(0);  //非负整数
             $form->ckeditor ('content', '房间介绍');
+            $form->text('longi', '经度')->rules('required|regex:/^[0-9]\d*$/');
+            $form->text('lati', '纬度')->rules('required|regex:/^[0-9]\d*$/');
+            $form->text('address', '地址')->rules('required');
 
-
-
-//            $form->number('single', '单间9折入住券')->rules('required|regex:/^[0-9]\d*$/');  //非负整数
+            $form->html(view('admin.yuntu')->render(), '地图定位');
+            $form->checkbox('ssss')->options([1 => 'foo', 2 => 'bar', 'val' => 'Option name']);
+            $form->radio('sssssss')->options(['m' => 'Female', 'f'=> 'Male', 'f1'=> 'Male1', 'f2'=> 'Male2'])->default('m');
             $form->text('country_id')->value($this->country);
 
+            $form->html('<style>.form-horizontal .checkbox, .form-horizontal .radio{float: left;}</style>' ); // 单选框一行
         });
     }
 }
