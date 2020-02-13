@@ -74,11 +74,17 @@ class CommonController extends BaseController
 
     public function uploadImg()
     {
-        $tmpFile = @$_FILES['imgFile']['tmp_name'];
+        $tmpFile = @$_FILES['file']['tmp_name'];
         $qiniu = new FileModel();
 
         $newName = uniqid() . '.jpg';
         $result = $qiniu->uploads($tmpFile, $newName);
-        return response()->json(['error' => 0, 'url' => $result]);
+        return response()->json([['error' => 0, 'url' => $result]]);
+    }
+
+    // 获取城市 -- 二级联动
+    public function  getCityAndArea(Request $request){
+        $pid = $request->get('id');
+        return responseSuccess(DB::connection('original')->table("districts")->where("pid","=",$pid)->select("name","id")->get());
     }
 }

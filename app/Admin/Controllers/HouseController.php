@@ -5,6 +5,8 @@ namespace App\Admin\Controllers;
 use App\Admin\Extensions\Form\YuntuMap;
 use App\Models\House;
 
+use App\Models\HouseAttr;
+use App\Models\HouseProperty;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Facades\Admin;
@@ -50,7 +52,7 @@ class HouseController extends Controller
             $content->header('header');
             $content->description('description');
 
-            $content->body($this->form()->edit($id));
+            $content->body($this->form($id)->edit($id));
         });
     }
 
@@ -157,10 +159,10 @@ class HouseController extends Controller
      *
      * @return Form
      */
-    protected function form()
+    protected function form($id = null)
     {
-
-        return House::form(function (Form $form) {
+        return House::form(function (Form $form) use ($id){
+            $form->html($id);
 
             $form->display('id', 'ID');
             $form->text('title', '标题')->rules('required');
@@ -173,14 +175,19 @@ class HouseController extends Controller
             $form->number('hallnum', '客厅数量')->rules('required|regex:/^[0-9]\d*$/')->default(0);
             $form->number('toiletnum', '卫生间数量')->rules('required|regex:/^[0-9]\d*$/')->default(0);  //非负整数
             $form->number('kitchennum', '厨房数量')->rules('required|regex:/^[0-9]\d*$/')->default(0);  //非负整数
-            $form->ckeditor ('content', '房间介绍');
+
+            HouseAttr::checkboxs($form, $id,'kitchenids');
+            HouseAttr::radios($form, $id,'category');
+
+            $form->html(view('admin.image')->render(), '图片');
+
             $form->text('longi', '经度')->rules('required|regex:/^[0-9]\d*$/');
             $form->text('lati', '纬度')->rules('required|regex:/^[0-9]\d*$/');
             $form->text('address', '地址')->rules('required');
-
             $form->html(view('admin.yuntu')->render(), '地图定位');
-            $form->checkbox('ssss')->options([1 => 'foo', 2 => 'bar', 'val' => 'Option name']);
-            $form->radio('sssssss')->options(['m' => 'Female', 'f'=> 'Male', 'f1'=> 'Male1', 'f2'=> 'Male2'])->default('m');
+
+            $form->ckeditor ('content', '房间介绍');
+
             $form->text('country_id')->value($this->country);
 
             $form->html('<style>.form-horizontal .checkbox, .form-horizontal .radio{float: left;}</style>' ); // 单选框一行

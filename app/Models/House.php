@@ -18,4 +18,9 @@ class House extends Model
 
         return new CustomerForm(new static(), $callback);
     }
+
+    public static function province($form, $id)
+    {
+        
+    }
 }

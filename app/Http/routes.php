@@ -49,7 +49,7 @@ $api->version('v1', ['namespace' => 'App\Api\Controllers'], function ($api) {
     $api->any('order/orderWxpaynotify', 'OrderController@orderWxpaynotify');//订单回调地址
     $api->post('order/Refund', 'OrderController@Refund');  //退款
 
-
+    $api->get('getCityAndArea','CommonController@getCityAndArea'); //省市区
 
 });
 
