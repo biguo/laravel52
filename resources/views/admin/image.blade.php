@@ -1,5 +1,8 @@
 
-
+<link rel="stylesheet" type="text/css" href="/packages/upload/css/upload.css">
+{{--<script src="http://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>--}}
+<script type="text/javascript" src="/packages/upload/js/webuploader.js"></script>
+<script type="text/javascript" src="/packages/upload/js/index.js"></script>
 <div class="block-flat">
 
     <div class="form-group">

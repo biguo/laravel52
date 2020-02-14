@@ -176,6 +176,10 @@ class HouseController extends Controller
             $form->number('toiletnum', '卫生间数量')->rules('required|regex:/^[0-9]\d*$/')->default(0);  //非负整数
             $form->number('kitchennum', '厨房数量')->rules('required|regex:/^[0-9]\d*$/')->default(0);  //非负整数
 
+            $province = DB::connection('original')->table("districts")->where("pid","=",0)->pluck('name', 'id');
+            $form->select('provinceid', '省份')->options(['请选择'] + $province)->rules('required|regex:/^[1-9]\d*(\.\d+)?$/');
+            $form->html(view('admin.city', ['form' => $form, 'id' => $id])->render());
+
             HouseAttr::checkboxs($form, $id,'kitchenids');
             HouseAttr::radios($form, $id,'category');
 
@@ -185,7 +189,6 @@ class HouseController extends Controller
             $form->text('lati', '纬度')->rules('required|regex:/^[0-9]\d*$/');
             $form->text('address', '地址')->rules('required');
             $form->html(view('admin.yuntu')->render(), '地图定位');
-
             $form->ckeditor ('content', '房间介绍');
 
             $form->text('country_id')->value($this->country);
