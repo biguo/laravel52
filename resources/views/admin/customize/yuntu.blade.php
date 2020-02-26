@@ -27,7 +27,9 @@
     }
 </style>
 <!--高德基础js-->
-<script src="/packages/layui/layui.all.js"></script>
+
+<script src="/packages/layer-v3.1.1/layer/layer.js"></script>
+<link href="/packages/layer-v3.1.1/layer/theme/default/layer.css" rel="stylesheet">
 <script type="text/javascript" src="http://webapi.amap.com/maps?v=1.3&key=f7f4f5f5cca0c860feb9ae2f65f9c310&plugin=AMap.Autocomplete,AMap.PlaceSearch"></script>
 <script src="http://webapi.amap.com/ui/1.0/main.js?v=1.0.11"></script>
 <script src="/packages/yuntu/house.js"></script>
