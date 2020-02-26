@@ -11,7 +11,7 @@ class CKEditor extends Field
         '/packages/ckeditor/adapters/jquery.js',
     ];
 
-    protected $view = 'admin.ckeditor';
+    protected $view = 'admin::customize.ckeditor';
 
     public function render()
     {

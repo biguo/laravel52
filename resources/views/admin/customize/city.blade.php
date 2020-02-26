@@ -18,18 +18,17 @@
     // 联动
     function nextSelect(upid, downid, url){
         $("." + upid).on("change", function(e) {
-            console.log(1111);
-            // $.get(
-            //     url ,{id: $(this).select2("val")},
-            //     function(data) {
-            //         let $select = $("." + downid);
-            //         let instance = $select.data('select2');
-            //         if(instance){
-            //             $select.select2('destroy').empty();
-            //         }
-            //         $("." + downid).select2({data: data.data});
-            //     }
-            // );
+            $.get(
+                url ,{id: $(this).select2("val")},
+                function(data) {
+                    let $select = $("." + downid);
+                    let instance = $select.data('select2');
+                    if(instance){
+                        $select.select2('destroy').empty();
+                    }
+                    $("." + downid).select2({data: data.data});
+                }
+            );
         });
     }
 

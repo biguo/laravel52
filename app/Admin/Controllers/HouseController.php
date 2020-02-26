@@ -78,19 +78,18 @@ class HouseController extends Controller
     {
 //        return $this->form()->update($id);
 
-        echo "<pre>";
+//        echo "<pre>";
         $data = Input::all();
-//        $model = $this->form()->model();
-//        print_r($model);
-        print_r($data);
-        exit;
+
+
         if ($validationMessages = $this->validationMessages($data)) {
             return back()->withInput()->withErrors($validationMessages);
         }
 
 
 
-
+//        print_r($data);
+//        exit;
 
         /* @var Model $this->model */
 //        $this->model = $this->model->with($this->getRelations())->findOrFail($id);
@@ -150,6 +149,14 @@ class HouseController extends Controller
             $grid->id('ID')->sortable();
             $grid->column('title', '房源名称')->editable();
             $grid->column('price', '价格');
+            $states = [
+                'on'  => ['value' => 5, 'text' => '上线', 'color' => 'primary'],
+                'off' => ['value' => 8, 'text' => '撤下', 'color' => 'default'],
+            ];
+            $grid->status()->switch($states);
+
+
+
         });
     }
 
@@ -161,7 +168,8 @@ class HouseController extends Controller
      */
     protected function form($id = null)
     {
-        return House::form(function (Form $form) use ($id){
+//        return House::form(function (Form $form) use ($id){
+        return Admin::form(House::class, function (Form $form) use ($id) {
             $form->html($id);
 
             $form->display('id', 'ID');
@@ -178,22 +186,25 @@ class HouseController extends Controller
 
             $province = DB::connection('original')->table("districts")->where("pid","=",0)->pluck('name', 'id');
             $form->select('provinceid', '省份')->options(['请选择'] + $province)->rules('required|regex:/^[1-9]\d*(\.\d+)?$/');
-            $form->html(view('admin.city', ['form' => $form, 'id' => $id])->render());
+            $form->html(view('admin::customize.city', ['form' => $form, 'id' => $id])->render());
 
             HouseAttr::checkboxs($form, $id,'kitchenids');
             HouseAttr::radios($form, $id,'category');
 
-            $form->html(view('admin.image')->render(), '图片');
+            $form->html(view('admin::customize.image')->render(), '图片');
 
             $form->text('longi', '经度')->rules('required|regex:/^[0-9]\d*$/');
             $form->text('lati', '纬度')->rules('required|regex:/^[0-9]\d*$/');
             $form->text('address', '地址')->rules('required');
-            $form->html(view('admin.yuntu')->render(), '地图定位');
+            $form->html(view('admin::customize.yuntu')->render(), '地图定位');
             $form->ckeditor ('content', '房间介绍');
-
             $form->text('country_id')->value($this->country);
+            echo '<style>.form-horizontal .checkbox, .form-horizontal .radio{float: left;}</style>'; // 单选框一行
+            $form->html(view('admin::customize.script')->render());
 
-            $form->html('<style>.form-horizontal .checkbox, .form-horizontal .radio{float: left;}</style>' ); // 单选框一行
+//            $script = "$('.pull-right button').attr('type','button');";
+//            $script .= "$('form').attr('id','first_form');";
+//            Admin::script($script);
         });
     }
 }

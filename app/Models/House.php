@@ -12,12 +12,6 @@ class House extends Model
 
     public $timestamps = false;
 
-    public static function form(\Closure $callback)  //使用自定义form表单  为了使用自定义的验证
-    {
-        Form::registerBuiltinFields();
-
-        return new CustomerForm(new static(), $callback);
-    }
 
     public static function province($form, $id)
     {
