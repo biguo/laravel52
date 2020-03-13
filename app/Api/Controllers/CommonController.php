@@ -29,16 +29,8 @@ class CommonController extends BaseController
             if (!preg_match("/^1[3456789]\d{9}$/", $phone)) {
                 return responseError('手机号格式不正确');
             }
-            $data = $request->all();
-            if ($data['type'] == 1)//1-注册 手机号存在，报错
-            {
-                if (Member::where('phone', $phone)->count() > 0) {
-                    return responseError('当前手机号已注册');
-                }
-            }
             //发送验证码
-            $smscode = new SmsCode();
-            return $smscode->getSmsCode($phone, $data['type']);
+            return (new SmsCode())->getSmsCode($phone, $request->input('type'));
         } else {
             return responseError('登陆方式有误');
         }

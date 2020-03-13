@@ -29,7 +29,7 @@ class MemberOauth extends Model
 
     public static function getXcxMemberOauth($openid, $mid)
     {
-        return self::where(['mid' => $mid, 'openid' => $openid])->first();
+        return self::where(['mid' => $mid, 'openid2' => $openid])->first();
     }
 
     public static function getMemberOauthByMid($mid)
