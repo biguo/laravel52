@@ -8,13 +8,13 @@ class MemberOauth extends Model
 {
 
     protected $table = 'member_oauth';
-
+    protected $connection = 'original';
     public $timestamps = false;
 
 
     public static function addMemberOauth($openid, $mid)
     {
-        $data = ['mid' => $mid, 'openid' => $openid];
+        $data = ['mid' => $mid, 'openid2' => $openid];
         //判断登陆关系是否已存在
         $num = self::where($data)->count();
         if ($num > 0)

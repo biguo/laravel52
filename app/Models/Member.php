@@ -11,6 +11,7 @@ class Member extends Authenticatable implements JWTSubject
 {
 
     protected $table = 'member'; //指定表名
+    protected $connection = 'original';
     protected $primaryKey = 'id'; //指定id
     public $timestamps = false;
 
@@ -45,11 +46,7 @@ class Member extends Authenticatable implements JWTSubject
         $data['regtime'] = date('Y-m-d H:i:s', time());
         $data['regip'] = $_SERVER['SERVER_ADDR'];
         $data = array_except($data, ['vercode', 'pphone', 'uid']);
-        $mid = DB::table('member')->insertGetId($data);
-        $original = DB::connection('original')->table("member")->where('phone', $data['phone'])->first();  //同步此用户到app,但仅是同步手机号, 账户等信息不互通
-        if(!$original){
-            DB::connection('original')->table('member')->insert($data);
-        }
+        $mid = self::insertGetId($data);
         return $mid;
     }
 
