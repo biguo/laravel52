@@ -47,6 +47,7 @@ $api->version('v1', ['namespace' => 'App\Api\Controllers'], function ($api) {
     $api->post('order/addOrder', 'OrderController@addOrder');  //下单
     $api->post('order/doPay', 'OrderController@doPay');  //付款
     $api->any('order/orderWxpaynotify', 'OrderController@orderWxpaynotify');//订单回调地址
+    $api->any('order/testOrder', 'OrderController@testOrder');//调试order
     $api->post('order/Refund', 'OrderController@Refund');  //退款
 
     $api->get('getCityAndArea','CommonController@getCityAndArea'); //省市区

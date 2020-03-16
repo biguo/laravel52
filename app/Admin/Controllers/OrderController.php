@@ -74,9 +74,9 @@ class OrderController extends Controller
     protected function grid()
     {
         return Admin::grid(Order::class, function (Grid $grid) {
-            $grid->model()->from('order as o')->leftJoin('member as m','m.id','=','o.mid')->select('m.phone','o.*')
-                ->where('o.country_id',$this->country)->orderBy('o.status', 'desc')->orderBy('o.id', 'desc');
-
+            $grid->model()->from('order')
+                ->leftJoin('iceland.ice_member as m','m.id','=','order.mid')->select('m.phone','order.*')
+                ->where('order.country_id',$this->country)->orderBy('order.status', 'desc')->orderBy('order.id', 'desc');
             $statusArr = ['1' => '待支付','2' => '已支付','4' => '已取消','5' => '已退款'];
             $grid->disableCreation();
             $grid->id('ID')->sortable();

@@ -2,14 +2,15 @@
 
 namespace App\Admin\Controllers;
 
+use App\Http\Controllers\Controller;
+use App\Models\Item;
 use App\Models\Product;
-
+use Encore\Admin\Controllers\ModelForm;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
-use App\Http\Controllers\Controller;
-use Encore\Admin\Controllers\ModelForm;
+use Illuminate\Support\Facades\Input;
 
 class ProductController extends Controller
 {
@@ -72,29 +73,30 @@ class ProductController extends Controller
     protected function grid()
     {
         return Admin::grid(Product::class, function (Grid $grid) {
-            $grid->model()->where('country_id',$this->country)->orderBy('status', 'desc')->orderBy('sort')->orderBy('id', 'desc');
+            $grid->model()->where('country_id', $this->country)->orderBy('status', 'desc')->orderBy('sort')->orderBy('id', 'desc');
             $grid->disableExport();
             $grid->disableRowSelector();
             $grid->id('ID')->sortable();
             $grid->title()->editable();
             $grid->image()->image(Upload_Domain, 100, 100);
-            $grid->column('icon','图标')->image(Upload_Domain, 30, 30);
+            $grid->column('icon', '图标')->image(Upload_Domain, 30, 30);
             $grid->price()->editable();
+            $grid->items()->display(function ($items) {
+                $items = array_map(function ($item) {
+                    return "<span class='label label-success'>{$item['title']}</span>";
+                }, $items);
+                return join('&nbsp;', $items);
+            });
+            $grid->weekend('是否可以在周末使用')->display(function ($weekend) {
+                return $weekend ? '是' : '否';
+            });
+            $grid->sort()->editable()->sortable();
+            $grid->status()->switch();
             $grid->filter(function ($filter) {
 //                $filter->useModal();
                 $filter->disableIdFilter();
                 $filter->like('title', 'Search');
             });
-
-            $grid->sort()->editable()->sortable();
-            $grid->status()->switch();
-            $grid->column('single','单间9折入住券');
-            $grid->column('whole','整栋8.5折入住券');
-            $grid->column('coffee','咖啡券');
-            $grid->column('wine','香槟');
-            $grid->column('cake','小蛋糕');
-
-            $grid->updated_at();
         });
     }
 
@@ -112,13 +114,12 @@ class ProductController extends Controller
             $form->image('image', 'image');
             $form->image('icon', 'icon');
             $form->number('price', 'price')->rules('required|regex:/^[1-9]\d*(\.\d+)?$/');  //大于1的正数
-            $form->number('single', '单间9折入住券')->rules('required|regex:/^[0-9]\d*$/');  //非负整数
-            $form->number('whole', '整栋8.5折入住券')->rules('required|regex:/^[0-9]\d*$/');
-            $form->number('coffee', '咖啡券')->rules('required|regex:/^[0-9]\d*$/');
-            $form->number('wine', '持卡人生日赠送香槟')->rules('required|regex:/^[0-9]\d*$/');
-            $form->number('cake', '持卡人生日送小蛋糕')->rules('required|regex:/^[0-9]\d*$/');
-            $form->text('content', 'content');
-            $form->hidden('country_id','country_id')->default($this->country);
+            $form->multipleSelect('items')->options(Item::all()->pluck('title', 'id'));
+
+            $form->radio('weekend', '是否能在周末使用')->options(['0' => '不能', '1'=> '可以'])->default('0');
+            echo '<style>.form-horizontal .checkbox, .form-horizontal .radio{float: left;}</style>'; // 单选框一行
+
+            $form->hidden('country_id', 'country_id')->default($this->country);
             $form->hidden('sort');
             $form->hidden('status');
             $form->display('created_at', 'Created At');

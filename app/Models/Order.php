@@ -11,7 +11,7 @@ use Tools\Pay\Wechatpay;
 class Order extends Model
 {
     protected $table = 'order';
-    protected $fillable = ['title', 'price', 'image','icon', 'country_id', 'product_id', 'mid', 'trade_no', 'single', 'whole', 'coffee', 'wine', 'cake'];
+    protected $fillable = ['title', 'price', 'image', 'icon', 'country_id', 'product_id', 'mid', 'trade_no'];
 
     public function country()
     {
@@ -57,7 +57,7 @@ class Order extends Model
             if (number_format($product->price, 2) != number_format($all['total'], 2)) {
                 return responseError("计算金额不对");
             }
-            $data = array_only($product->toarray(), ['title', 'price', 'image','icon', 'country_id', 'single', 'whole', 'coffee', 'wine', 'cake']);
+            $data = array_only($product->toarray(), ['title', 'price', 'image', 'icon', 'country_id']);
             $all = array_except($all, ['total']);
             $data = array_merge($data, $all);
             $data['trade_no'] = 'Add' . StrOrderOne();
@@ -89,7 +89,7 @@ class Order extends Model
             }
 
             $memberOauth = MemberOauth::getMemberOauthByMid($mid);
-            if ((!$memberOauth) || (!$memberOauth->openid)) {
+            if ((!$memberOauth) || (!$memberOauth->openid2)) {
                 return responseError("未绑定openid");
             }
 
@@ -104,7 +104,6 @@ class Order extends Model
             }
 
             $data['paydata'] = $weChatPay->getXcxOrder($appId, $prepay_ver['data']);
-            $data['leftamount'] = Member::getMemberById($mid)->leftamount;
             //支付成功或添加账单明细
             return responseSuccess($data);
         } else {
@@ -132,8 +131,7 @@ class Order extends Model
      */
     public function orderWxpaynotify($object)
     {
-
-        $order = Order::getOrderByTradeNo($object->out_trade_no);  //调试完  把第二个参数去掉
+        $order = Order::getOrderByTradeNo($object->out_trade_no, 0);  //调试完  把第二个参数去掉
         if ($order) {
             DB::beginTransaction();
             $order->status = Status_Payed;
@@ -143,9 +141,8 @@ class Order extends Model
             $save = $order->save();
             $array = array_only(array_merge($order->toarray(), object_array($object)), ['trade_no', 'title', 'mid', 'total_fee', 'country_id']);
             $record = AccountRecord::create($array);
-            $increment = Member::getMemberById($order->mid)->increment("leftamount", $order->price);
             $this->prepareCard($order);
-            if ($save && $record && $increment) {
+            if ($save && $record) {
                 DB::commit();
                 return responseSuccess("支付成功");
             } else {
@@ -162,45 +159,16 @@ class Order extends Model
     {
         Card::where('mid', $order->mid)->delete();
         $orderArr = $order->toarray();
+        $itemArr = $order->product->items->toarray();
         $info = array_only($orderArr, ['mid', 'country_id']);
-
-        $levelArray = [
-            'type' => 'level',
-            'category' => 'level',
-            'info' => json_encode(['image' => Upload_Domain . $order->image, 'icon' => Upload_Domain . $order->icon]),
-            'description' => $order->title,
-            'code' => 'VIP' . StrOrderOne(),
-            'expired_at' => date('Y-m-d H:i:s',strtotime(" +1 year"))
-        ];
-        $CardTypeArray = [
-            'single' => [
-                'type' => 'single',
-                'category' => 'discount',
-                'info' => '9',
-                'description' => '单间入住折扣券'
-            ],
-            'whole' => ['type' => 'whole',
-                'category' => 'discount',
-                'info' => '8.5',
-                'description' => '整栋入住折扣券'
-            ],
-            'coffee' => ['type' => 'coffee',
-                'category' => 'voucher',
-                'info' => '咖啡代金券',
-                'description' => '冯梦龙咖啡厅'
-            ]
-        ];
-        foreach ($orderArr as $key => $value) {
-            if (isset($CardTypeArray[$key]) && ($CardType = $CardTypeArray[$key]) && ($value > 0)) {
-                for ($i = 1; $i <= $value; $i++) {
-                    $info = array_merge($info, $CardType);
-                    $info['code'] = 'USE' . StrOrderOne();
-                    $info['expired_at'] = date('Y-m-d H:i:s',strtotime(" +1 year"));
-                    Card::create($info);
-                }
-            }
+        foreach ($itemArr as $key => $value) {
+            $value = array_only($value, ['title','description', 'main']);
+            $info = array_merge($info, $value);
+            $info['code'] = 'USE' . StrOrderOne();
+            $info['info'] = $value['title'];
+            $info['type'] = $value['main'];
+            unset($info['main'] );
+            Card::create($info);
         }
-        $info = array_merge($info, $levelArray);
-        Card::create($info);
     }
 }

@@ -15,5 +15,6 @@ Route::group([
     $router->resource('country', CountryController::class);
     $router->get('/orders', 'OrderController@index');
     $router->resource('product', ProductController::class);
-    $router->resource('house', HouseController::class);
+//    $router->resource('house', HouseController::class);
+    $router->resource('item', ItemController::class);
 });

@@ -29,20 +29,15 @@ class MemberController extends BaseController
             $member = Member::getMemberById($mid);
             $array = array();
             if ($member)
-                $array = array_only($member->toarray(), ['id', 'phone', 'headpic', 'nickname', 'description', 'point', 'leftamount']);
+                $array = array_only($member->toarray(), ['id', 'phone', 'headpic', 'nickname', 'description', 'point']);
             $array['cardNum'] = count($member->cards);
-            $card = $member->cards()->where('type','level')->first();
+            $card = $member->cards()->where('type','1')->first();
             if($card){
-                $info = json_decode($card->info, true);
-                $array['icon'] = $info['icon'];
-                $array['level'] = str_replace('会员卡','至尊',$card->description);
                 $array['code'] = $card->code;
-                $array['description'] = $card->description;
+                $array['info'] = $card->info;
             }else{
-                $array['icon'] = Default_Icon;
-                $array['level'] = '普通会员';
                 $array['code'] = '';
-                $array['description'] = '普通会员卡';
+                $array['info'] = '普通会员';
             }
             return responseSuccess($array);
         }
@@ -144,13 +139,6 @@ class MemberController extends BaseController
 
             if ($member) {
                 $return = $member->toarray();
-                $card = $member->cards()->where('type','level')->first();
-                if(!$card){
-                    $card = ['code' => '','description' => '普通会员'];
-                }else{
-                    $card = array_only($card->toarray(),['code','description']);
-                }
-                $return['card'] = $card;
                 Redis::set('country:openid:' . $return['id'], $data['uid']);  //指定当前的用户在哪个村的小程序
 
                 $return['jwttoken'] = $this->JwtEncryption($member);
