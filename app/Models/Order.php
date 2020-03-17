@@ -162,15 +162,10 @@ class Order extends Model
         $itemArr = $order->product->items->toarray();
         $info = array_only($orderArr, ['mid', 'country_id']);
         foreach ($itemArr as $key => $value) {
-            $value = array_only($value, ['title','description', 'main', 'canuse']);
+            $value = array_only($value, ['title','description']);
             $card = array_merge($info, $value);
             $card['info'] = $value['title'];
-            $card['type'] = $value['main'];
             $card['trade_no'] = $order->trade_no;
-            unset($card['main'] );
-            if( $card['canuse'] == 1){
-                $card['code'] = 'USE' . StrOrderOne();
-            }
             Card::create($card);
         }
     }

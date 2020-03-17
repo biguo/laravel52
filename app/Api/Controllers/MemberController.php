@@ -33,8 +33,11 @@ class MemberController extends BaseController
             if ($member)
                 $array = array_only($member->toarray(), ['id', 'phone', 'headpic', 'nickname', 'description', 'point']);
 
+            $member->orders()->where('status', Status_UnPay)->delete();
+            $array['doingOrders'] = $member->orders()->where('status', Status_Payed)->count();
+            $array['trade_no'] = $member->orders()->where('status', Status_Payed)->value('trade_no');
             $array['saved'] = Order::where('mid', $mid)->whereIn('status', [Status_Payed, Status_OrderUsed])->sum('saved');
-            $array['card'] = Card::where('mid', $mid)->select('code','status','info', 'type', 'description','canuse')->orderBy('status','asc')->get();
+            $array['card'] = Card::where('mid', $mid)->select('info', 'description')->get();
             return responseSuccess($array);
         }
         return responseError('非法请求');
@@ -52,8 +55,14 @@ class MemberController extends BaseController
             if (!$mid) {
                 return responseError('请登录');
             }
-            $object = Card::where('mid', $mid)->select('code','status','info', 'type', 'description','canuse')->orderBy('status','asc')->get();
-            return responseSuccess($object);
+            $order = Order::where('mid',$mid)->orderBy('created_at','desc')->first();
+            if($order){
+                $array['trade_no'] = $order->trade_no;
+                $array['status'] = ($order->status === 2)? 0:1;
+                $array['image'] = $order->image ;
+            }
+            $array['card'] = Card::where('mid', $mid)->select('info', 'description')->get();
+            return responseSuccess($array);
         }
         return responseError('非法请求');
     }
@@ -72,18 +81,13 @@ class MemberController extends BaseController
                 return responseError('请登录');
             }
             $data = $request->all();
-            $data['status'] = Status_UnUse;
-            $data['mid'] = $mid;
-            $card = Card::where($data)->first();
-            if (!$card)
-                return responseError('没有符合条件的卡');
-            $card->status = Status_Used;
-            $card->save();
-            $left = Card::where(['status' => Status_UnUse, 'mid' => $mid, 'trade_no' => $card->trade_no, 'canuse' => 1 ])->count();
-            if($left == 0){
-                Order::where(['trade_no' => $card->trade_no])->update(['status' => Status_OrderUsed]);
-            }
-            return responseSuccess($card->code);
+
+            $order = Order::where(['trade_no' => $data['code'], 'status' => Status_Payed, 'mid' => $mid])->first();
+            if (!$order)
+                return responseError('没有符合条件的订单');
+            $order->status = Status_OrderUsed;
+            $order->saved;
+            return responseSuccess($data['code']);
         } else
             return responseError('非法请求');
     }

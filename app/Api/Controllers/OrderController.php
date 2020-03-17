@@ -127,7 +127,7 @@ class OrderController extends BaseController
 
 //    public function testOrder()
 //    {
-//        $order = Order::getOrderByTradeNo('Add2020031709534', 0);  //调试完  把第二个参数去掉
+//        $order = Order::getOrderByTradeNo('Add2020031702994', 0);  //调试完  把第二个参数去掉
 //        (new Order())->prepareCard($order);
 //    }
 

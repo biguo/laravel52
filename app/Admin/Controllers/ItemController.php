@@ -77,12 +77,6 @@ class ItemController extends Controller
 
             $grid->id('ID')->sortable();
             $grid->column('title', '名称')->editable();
-            $grid->column('main', '主卡')->display(function ($main){
-                return ($main == 1)? 'O' :'/';
-            });
-            $grid->column('canuse', '可以作为卡券使用')->display(function ($canuse){
-                return ($canuse == 1)? 'O' :'/';
-            });
             $grid->created_at();
             $grid->updated_at();
         });
@@ -100,10 +94,7 @@ class ItemController extends Controller
             $form->display('id', 'ID');
             $form->text('title', '标题')->rules('required');
             $form->text('description', '详情');
-            $form->radio('main', '是否作为主卡')->options(['0' => '否', '1'=> '是'])->default('0');
-            $form->radio('canuse', '可以作为卡券使用')->options(['0' => '否', '1'=> '是'])->default('1');
             $form->hidden('country_id','country_id')->default($this->country);
-            echo '<style>.form-horizontal .checkbox, .form-horizontal .radio{float: left;}</style>'; // 单选框一行
             $form->display('created_at', 'Created At');
             $form->display('updated_at', 'Updated At');
         });
