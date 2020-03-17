@@ -79,7 +79,8 @@ class ProductController extends Controller
             $grid->id('ID')->sortable();
             $grid->title()->editable();
             $grid->image()->image(Upload_Domain, 100, 100);
-            $grid->column('icon', '图标')->image(Upload_Domain, 30, 30);
+            $grid->column('unuse_image', '未使用图片')->image(Upload_Domain, 150, 100);
+            $grid->column('used_image', '已使用图片')->image(Upload_Domain, 150, 100);
             $grid->price()->editable();
             $grid->items()->display(function ($items) {
                 $items = array_map(function ($item) {
@@ -87,7 +88,7 @@ class ProductController extends Controller
                 }, $items);
                 return join('&nbsp;', $items);
             });
-            $grid->weekend('是否可以在周末使用')->display(function ($weekend) {
+            $grid->weekend('周末使用')->display(function ($weekend) {
                 return $weekend ? '是' : '否';
             });
             $grid->sort()->editable()->sortable();
@@ -112,7 +113,8 @@ class ProductController extends Controller
             $form->display('id', 'ID');
             $form->text('title', 'title')->rules('required|min:3');
             $form->image('image', 'image');
-            $form->image('icon', 'icon');
+            $form->image('unuse_image', '未使用图片');
+            $form->image('used_image', '已使用图片');
             $form->number('price', 'price')->rules('required|regex:/^[1-9]\d*(\.\d+)?$/');  //大于1的正数
             $form->multipleSelect('items')->options(Item::all()->pluck('title', 'id'));
 

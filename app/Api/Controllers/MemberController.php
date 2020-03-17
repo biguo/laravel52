@@ -34,8 +34,20 @@ class MemberController extends BaseController
                 $array = array_only($member->toarray(), ['id', 'phone', 'headpic', 'nickname', 'description', 'point']);
 
             $member->orders()->where('status', Status_UnPay)->delete();
+            $order = Order::where('mid',$mid)->orderBy('created_at','desc')->first();
+            if($order){
+                $array['trade_no'] = $order->trade_no;
+                $array['image'] = Upload_Domain.$order->image ;
+                if($order->status === 2){
+                    $array['status'] = 0;
+                    $array['current_image'] = Upload_Domain.$order->unuse_image;
+                }else{
+                    $array['status'] = 1;
+                    $array['current_image'] = Upload_Domain.$order->used_image;
+                }
+            }
             $array['doingOrders'] = $member->orders()->where('status', Status_Payed)->count();
-            $array['trade_no'] = $member->orders()->where('status', Status_Payed)->value('trade_no');
+
             $array['saved'] = Order::where('mid', $mid)->whereIn('status', [Status_Payed, Status_OrderUsed])->sum('saved');
             $array['card'] = Card::where('mid', $mid)->select('info', 'description')->get();
             return responseSuccess($array);
@@ -59,7 +71,7 @@ class MemberController extends BaseController
             if($order){
                 $array['trade_no'] = $order->trade_no;
                 $array['status'] = ($order->status === 2)? 0:1;
-                $array['image'] = $order->image ;
+                $array['image'] = Upload_Domain.$order->image ;
             }
             $array['card'] = Card::where('mid', $mid)->select('info', 'description')->get();
             return responseSuccess($array);
@@ -86,7 +98,7 @@ class MemberController extends BaseController
             if (!$order)
                 return responseError('没有符合条件的订单');
             $order->status = Status_OrderUsed;
-            $order->saved;
+            $order->save();
             return responseSuccess($data['code']);
         } else
             return responseError('非法请求');
