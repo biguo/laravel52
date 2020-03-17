@@ -33,8 +33,8 @@ class OrderController extends BaseController
             return responseError('请输入产品id');
         }
         $member = Member::getMemberById($mid);
-        if (count($member->unPayOrders()) > 0) {
-            return responseError('有未支付的订单');
+        if (count($member->doingOrders()) > 0) {
+            return responseError('您有未支付的订单或者您的套餐未使用完');
         }
         $inputs['mid'] = $mid;
         return (new Order())->AddOrder($inputs);
@@ -124,6 +124,12 @@ class OrderController extends BaseController
         }
         return (new Order())->orderWxpaynotify($response);
     }
+
+//    public function testOrder()
+//    {
+//        $order = Order::getOrderByTradeNo('Add2020031709534', 0);  //调试完  把第二个参数去掉
+//        (new Order())->prepareCard($order);
+//    }
 
 
 }

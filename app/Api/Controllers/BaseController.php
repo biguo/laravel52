@@ -25,7 +25,8 @@ class BaseController extends Controller
 
         if($jwttoken!='' && !empty($jwttoken) && $jwttoken !=='[object Undefined]') {
             jwt ::setToken($jwttoken);       //加这一行 这是JWT 0.5和1.0间的区别
-            if ($array = $this->JWTAuth->toUser()->toarray()) {
+            $user = $this->JWTAuth->toUser();
+            if(( $user != '')&&($array = $user->toarray())){
                 if(isset($field)){
                     return $array[$field];
                 }

@@ -25,6 +25,11 @@ class Member extends Authenticatable implements JWTSubject
         return $this->orders()->where('status', Status_UnPay)->get();
     }
 
+    public function doingOrders()
+    {
+        return $this->orders()->whereIn('status', [Status_UnPay, Status_Payed])->get();
+    }
+
     public function cards()
     {
         return $this->hasMany(Card::class, 'mid');

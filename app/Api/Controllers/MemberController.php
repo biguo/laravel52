@@ -2,10 +2,12 @@
 
 namespace App\Api\Controllers;
 
+use App\Models\AccountRecord;
 use App\Models\Card;
 use App\Models\Country;
 use App\Models\Member;
 use App\Models\MemberOauth;
+use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
@@ -30,15 +32,9 @@ class MemberController extends BaseController
             $array = array();
             if ($member)
                 $array = array_only($member->toarray(), ['id', 'phone', 'headpic', 'nickname', 'description', 'point']);
-            $array['cardNum'] = count($member->cards);
-            $card = $member->cards()->where('type','1')->first();
-            if($card){
-                $array['code'] = $card->code;
-                $array['info'] = $card->info;
-            }else{
-                $array['code'] = '';
-                $array['info'] = '普通会员';
-            }
+
+            $array['saved'] = Order::where('mid', $mid)->whereIn('status', [Status_Payed, Status_OrderUsed])->sum('saved');
+            $array['card'] = Card::where('mid', $mid)->select('code','status','info', 'type', 'description','canuse')->orderBy('status','asc')->get();
             return responseSuccess($array);
         }
         return responseError('非法请求');
@@ -56,20 +52,8 @@ class MemberController extends BaseController
             if (!$mid) {
                 return responseError('请登录');
             }
-            $object = DB::table('card')->where('mid', $mid)->where('status', Status_UnUse)->select(DB::raw('count(id) as count'), 'code','info', 'type', 'category', 'description')->groupBy('category')->groupBy('type')->get();
-            $array = object_array($object);
-            $sorted = [];
-            foreach ($array as $item) {
-                if (!isset($sorted[$item['category']])) {
-                    $sorted[$item['category']] = [];
-                }
-                if($item['category'] === 'level'){
-                    $info = json_decode($item['info'], true);
-                    $item['info'] = $info['image'];
-                }
-                array_push($sorted[$item['category']], $item);
-            }
-            return responseSuccess($sorted);
+            $object = Card::where('mid', $mid)->select('code','status','info', 'type', 'description','canuse')->orderBy('status','asc')->get();
+            return responseSuccess($object);
         }
         return responseError('非法请求');
     }
@@ -95,6 +79,10 @@ class MemberController extends BaseController
                 return responseError('没有符合条件的卡');
             $card->status = Status_Used;
             $card->save();
+            $left = Card::where(['status' => Status_UnUse, 'mid' => $mid, 'trade_no' => $card->trade_no, 'canuse' => 1 ])->count();
+            if($left == 0){
+                Order::where(['trade_no' => $card->trade_no])->update(['status' => Status_OrderUsed]);
+            }
             return responseSuccess($card->code);
         } else
             return responseError('非法请求');
@@ -112,7 +100,7 @@ class MemberController extends BaseController
             if (!$mid) {
                 return responseError('请登录');
             }
-            $object = DB::table('account_record')->where('mid', $mid)->where('change', Change_Recharge)->orderBy('created_at','desc')->get();
+            $object = AccountRecord::where('mid', $mid)->where('change', Change_Recharge)->orderBy('created_at','desc')->get();
             return responseSuccess($object);
         }
         return responseError('非法请求');

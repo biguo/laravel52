@@ -11,7 +11,7 @@ use Tools\Pay\Wechatpay;
 class Order extends Model
 {
     protected $table = 'order';
-    protected $fillable = ['title', 'price', 'image', 'icon', 'country_id', 'product_id', 'mid', 'trade_no'];
+    protected $fillable = ['title', 'price', 'image', 'icon', 'country_id', 'product_id', 'mid', 'trade_no', 'saved'];
 
     public function country()
     {
@@ -57,7 +57,7 @@ class Order extends Model
             if (number_format($product->price, 2) != number_format($all['total'], 2)) {
                 return responseError("计算金额不对");
             }
-            $data = array_only($product->toarray(), ['title', 'price', 'image', 'icon', 'country_id']);
+            $data = array_only($product->toarray(), ['title', 'price', 'image', 'icon','saved', 'country_id']);
             $all = array_except($all, ['total']);
             $data = array_merge($data, $all);
             $data['trade_no'] = 'Add' . StrOrderOne();
@@ -131,7 +131,7 @@ class Order extends Model
      */
     public function orderWxpaynotify($object)
     {
-        $order = Order::getOrderByTradeNo($object->out_trade_no, 0);  //调试完  把第二个参数去掉
+        $order = Order::getOrderByTradeNo($object->out_trade_no);  //调试完  把第二个参数去掉
         if ($order) {
             DB::beginTransaction();
             $order->status = Status_Payed;
@@ -162,13 +162,16 @@ class Order extends Model
         $itemArr = $order->product->items->toarray();
         $info = array_only($orderArr, ['mid', 'country_id']);
         foreach ($itemArr as $key => $value) {
-            $value = array_only($value, ['title','description', 'main']);
-            $info = array_merge($info, $value);
-            $info['code'] = 'USE' . StrOrderOne();
-            $info['info'] = $value['title'];
-            $info['type'] = $value['main'];
-            unset($info['main'] );
-            Card::create($info);
+            $value = array_only($value, ['title','description', 'main', 'canuse']);
+            $card = array_merge($info, $value);
+            $card['info'] = $value['title'];
+            $card['type'] = $value['main'];
+            $card['trade_no'] = $order->trade_no;
+            unset($card['main'] );
+            if( $card['canuse'] == 1){
+                $card['code'] = 'USE' . StrOrderOne();
+            }
+            Card::create($card);
         }
     }
 }
