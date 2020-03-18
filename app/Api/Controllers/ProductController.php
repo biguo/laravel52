@@ -16,7 +16,7 @@ class ProductController extends BaseController
 
         $chosen = [];
         foreach ($products as $data) {
-            $data['items'] = Item::from('item as i')->join('product_item as r','i.id','=','r.item_id')->where('r.product_id', $data['id'])->select('title','description','main')->get()->toArray();
+            $data['items'] = Item::from('item as i')->join('product_item as r','i.id','=','r.item_id')->where('r.product_id', $data['id'])->select('title','description')->get()->toArray();
             $chosen[] = $data;
         }
         return responseSuccess($chosen);

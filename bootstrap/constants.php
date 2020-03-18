@@ -23,6 +23,7 @@ define('Change_Consume',2);//消费
 define('Upload_Domain','http://upload.binghuozhijia.com/');//七牛
 define('Default_Icon','http://upload.binghuozhijia.com/image/pt.jpg');//默认等级
 define('Default_Pic','http://bhzj.binghuozhijia.com/test/bhzj/public/sample/default_pic.png');//默认头像
+define('wanted','http://upload.binghuozhijia.com/uploads/5e71b0619c92e/5e71b0619c8d5.jpg');
 
 
 

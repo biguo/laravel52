@@ -45,10 +45,13 @@ class MemberController extends BaseController
                     $array['status'] = 1;
                     $array['current_image'] = Upload_Domain.$order->used_image;
                 }
+            }else{
+                $array['trade_no'] = '';
+                $array['current_image'] = wanted;
             }
             $array['doingOrders'] = $member->orders()->where('status', Status_Payed)->count();
-
-            $array['saved'] = Order::where('mid', $mid)->whereIn('status', [Status_Payed, Status_OrderUsed])->sum('saved');
+            $saved = Order::where('mid', $mid)->whereIn('status', [Status_Payed, Status_OrderUsed])->sum('saved');
+            $array['saved'] = ($saved === null) ? 0 :$saved ;
             $array['card'] = Card::where('mid', $mid)->select('info', 'description')->get();
             return responseSuccess($array);
         }
