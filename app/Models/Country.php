@@ -45,7 +45,7 @@ class Country extends Model
     public function usedProduct()
     {
         return $this->products()->where('status', Status_Online)
-            ->select('id', 'title','price',DB::raw("concat('" . Upload_Domain . "', image) as image"),DB::raw("concat('" . Upload_Domain . "', icon) as icon"))
+            ->select('id', 'title','price','promotional_price',DB::raw("concat('" . Upload_Domain . "', image) as image"),DB::raw("concat('" . Upload_Domain . "', icon) as icon"))
             ->orderBy('sort', 'asc')->get();
     }
 

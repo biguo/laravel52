@@ -77,22 +77,20 @@ class ProductController extends Controller
             $grid->disableExport();
             $grid->disableRowSelector();
             $grid->id('ID')->sortable();
-            $grid->title()->editable();
-            $grid->image()->image(Upload_Domain, 100, 100);
+            $grid->title('名称')->editable();
+            $grid->image('图片')->image(Upload_Domain, 100, 100);
             $grid->column('unuse_image', '未使用图片')->image(Upload_Domain, 150, 100);
             $grid->column('used_image', '已使用图片')->image(Upload_Domain, 150, 100);
-            $grid->price()->editable();
-            $grid->items()->display(function ($items) {
+            $grid->price('价格')->editable();
+            $grid->promotional_price('宣传价格')->editable();
+            $grid->items('项目')->display(function ($items) {
                 $items = array_map(function ($item) {
-                    return "<span class='label label-success'>{$item['title']}</span>";
+                    return "<span>{$item['title']}</span>";
                 }, $items);
-                return join('&nbsp;', $items);
-            });
-            $grid->weekend('周末使用')->display(function ($weekend) {
-                return $weekend ? '是' : '否';
+                return "<div style='width:500px'>".join('&nbsp;<br>', $items)."</div>";
             });
             $grid->sort()->editable()->sortable();
-            $grid->status()->switch();
+            $grid->status('状态')->switch();
             $grid->filter(function ($filter) {
 //                $filter->useModal();
                 $filter->disableIdFilter();
@@ -115,10 +113,10 @@ class ProductController extends Controller
             $form->image('image', 'image');
             $form->image('unuse_image', '未使用图片');
             $form->image('used_image', '已使用图片');
-            $form->number('price', 'price')->rules('required|regex:/^[1-9]\d*(\.\d+)?$/');  //大于1的正数
+            $form->number('price', '支付价格')->rules('required|regex:/^[0-9]\d*(\.\d+)?$/');  //
+            $form->number('promotional_price', '宣传价格')->rules('required|regex:/^[0-9]\d*(\.\d+)?$/');  //
             $form->multipleSelect('items')->options(Item::all()->pluck('title', 'id'));
-
-            $form->radio('weekend', '是否能在周末使用')->options(['0' => '不能', '1'=> '可以'])->default('0');
+            $form->radio('will_refund', '入住之后退款')->options(['0' => '不能', '1'=> '可以'])->default('0');
             $form->hidden('country_id', 'country_id')->default($this->country);
             $form->hidden('sort');
             $form->hidden('status');

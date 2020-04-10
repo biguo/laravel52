@@ -11,7 +11,7 @@ use Tools\Pay\Wechatpay;
 class Order extends Model
 {
     protected $table = 'order';
-    protected $fillable = ['title', 'price', 'image', 'icon', 'country_id', 'product_id', 'mid', 'trade_no', 'saved','weekend', 'unuse_image', 'used_image'];
+    protected $fillable = ['title', 'price', 'will_refund', 'image', 'icon', 'country_id', 'product_id', 'mid', 'trade_no', 'saved','weekend', 'unuse_image', 'used_image'];
 
     public function country()
     {
@@ -57,7 +57,7 @@ class Order extends Model
             if (number_format($product->price, 2) != number_format($all['total'], 2)) {
                 return responseError("计算金额不对");
             }
-            $data = array_only($product->toarray(), ['title', 'price', 'image', 'icon','saved', 'country_id', 'weekend', 'unuse_image', 'used_image']);
+            $data = array_only($product->toarray(), ['title', 'price', 'will_refund', 'image', 'icon','saved', 'country_id', 'weekend', 'unuse_image', 'used_image']);
             $all = array_except($all, ['total']);
             $data = array_merge($data, $all);
             $data['trade_no'] = 'Add' . StrOrderOne();
