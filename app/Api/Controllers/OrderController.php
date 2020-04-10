@@ -33,6 +33,7 @@ class OrderController extends BaseController
             return responseError('请输入产品id');
         }
         $member = Member::getMemberById($mid);
+        $member->orders()->where('status', Status_UnPay)->delete();
         if (count($member->doingOrders()) > 0) {
             return responseError('您有未支付的订单或者您的套餐未使用完');
         }

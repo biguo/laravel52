@@ -119,8 +119,6 @@ class ProductController extends Controller
             $form->multipleSelect('items')->options(Item::all()->pluck('title', 'id'));
 
             $form->radio('weekend', '是否能在周末使用')->options(['0' => '不能', '1'=> '可以'])->default('0');
-            echo '<style>.form-horizontal .checkbox, .form-horizontal .radio{float: left;}</style>'; // 单选框一行
-
             $form->hidden('country_id', 'country_id')->default($this->country);
             $form->hidden('sort');
             $form->hidden('status');

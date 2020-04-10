@@ -77,7 +77,7 @@ class OrderController extends Controller
             $grid->model()->from('order')
                 ->leftJoin('iceland.ice_member as m','m.id','=','order.mid')->select('m.phone','order.*')
                 ->where('order.country_id',$this->country)->orderBy('order.status', 'desc')->orderBy('order.id', 'desc');
-            $statusArr = ['1' => '待支付','2' => '已支付','4' => '已取消','5' => '已退款'];
+            $statusArr = ['1' => '待支付','2' => '已支付','4' => '已取消','5' => '已退款','6' => '已使用'];
             $grid->disableCreation();
             $grid->id('ID')->sortable();
 
@@ -100,6 +100,7 @@ class OrderController extends Controller
                     '2' => '已支付',
                     '4' => '已取消',
                     '5' => '已退款',
+                    '6' => '已使用',
                 ]);
 
 //                $filter->between('created_at', 'Created Time')->datetime();
