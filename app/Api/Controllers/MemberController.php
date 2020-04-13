@@ -48,6 +48,7 @@ class MemberController extends BaseController
                     $array['current_image'] = Upload_Domain.$order->used_image;
                 }
             }else{
+                $array['title'] = '';
                 $array['trade_no'] = '';
                 $array['current_image'] = wanted;
             }
