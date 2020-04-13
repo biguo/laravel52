@@ -38,6 +38,8 @@ class MemberController extends BaseController
             if($order){
                 $array['trade_no'] = $order->trade_no;
                 $array['image'] = Upload_Domain.$order->image ;
+                $array['title'] = $order->title;
+                $array['product_id'] = $order->product_id;
                 if($order->status === 2){
                     $array['status'] = 0;
                     $array['current_image'] = Upload_Domain.$order->unuse_image;
