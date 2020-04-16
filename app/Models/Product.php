@@ -25,6 +25,12 @@ class Product extends Model
         return $this->belongsToMany(Item::class, 'product_item', 'product_id', 'item_id');
     }
 
+    public function rules()
+    {
+        return $this->belongsToMany(Rule::class, 'product_rule', 'product_id', 'rule_id');
+    }
+
+
     public static function getById($product_id = null)
     {
         if (!$product_id) {

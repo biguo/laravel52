@@ -17,4 +17,5 @@ Route::group([
     $router->resource('product', ProductController::class);
 //    $router->resource('house', HouseController::class);
     $router->resource('item', ItemController::class);
+    $router->resource('rule', RuleController::class);
 });

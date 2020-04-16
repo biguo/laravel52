@@ -5,6 +5,7 @@ namespace App\Admin\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Item;
 use App\Models\Product;
+use App\Models\Rule;
 use Encore\Admin\Controllers\ModelForm;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
@@ -87,7 +88,13 @@ class ProductController extends Controller
                 $items = array_map(function ($item) {
                     return "<span>{$item['title']}</span>";
                 }, $items);
-                return "<div style='width:500px'>".join('&nbsp;<br>', $items)."</div>";
+                return "<div style='width:250px'>".join('&nbsp;<br>', $items)."</div>";
+            });
+            $grid->rules('规则')->display(function ($rules) {
+                $rules = array_map(function ($rule) {
+                    return "<span>{$rule['title']}</span>";
+                }, $rules);
+                return "<div style='width:250px'>".join('&nbsp;<br>', $rules)."</div>";
             });
             $grid->sort()->editable()->sortable();
             $grid->status('状态')->switch();
@@ -115,7 +122,8 @@ class ProductController extends Controller
             $form->image('used_image', '已使用图片');
             $form->number('price', '支付价格')->rules('required|regex:/^[0-9]\d*(\.\d+)?$/');  //
             $form->number('promotional_price', '宣传价格')->rules('required|regex:/^[0-9]\d*(\.\d+)?$/');  //
-            $form->multipleSelect('items')->options(Item::all()->pluck('title', 'id'));
+            $form->multipleSelect('items', '套餐')->options(Item::all()->pluck('title', 'id'));
+            $form->multipleSelect('rules', '规则')->options(Rule::all()->pluck('title', 'id'));
             $form->radio('will_refund', '入住之后退款')->options(['0' => '不能', '1'=> '可以'])->default('0');
             $form->hidden('country_id', 'country_id')->default($this->country);
             $form->hidden('sort');

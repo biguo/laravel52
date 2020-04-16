@@ -6,18 +6,24 @@ use App\Models\Country;
 use App\Models\Item;
 use App\Models\Member;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Input;
 
 class ProductController extends BaseController
 {
     public function getList(Request $request)
     {
-
+        $idx = Input::get('index');
         $products = Country::current()->usedProduct()->toarray();
-
         $chosen = [];
-        foreach ($products as $data) {
+        foreach ($products as $key => $data) {
             $data['items'] = Item::from('item as i')->join('product_item as r','i.id','=','r.item_id')->where('r.product_id', $data['id'])->select('title','description')->get()->toArray();
-            $chosen[] = $data;
+            $data['rules'] = Item::from('rule as i')->join('product_rule as r','i.id','=','r.rule_id')->where('r.product_id', $data['id'])->select('title','description')->get()->toArray();
+            if(isset($idx) && ($idx == $key)){
+                $chosen = $data;
+                break;
+            }else{
+                $chosen[] = $data;
+            }
         }
         return responseSuccess($chosen);
     }
