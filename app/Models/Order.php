@@ -44,7 +44,8 @@ class Order extends Model
         if ($status !== 0) {
             array_push($where, ["status", "=", $status]);
         }
-        return self::where($where)->first();
+        $order = self::where($where)->first();
+        return $order;
     }
 
     /**
@@ -94,7 +95,7 @@ class Order extends Model
             }
 
             $redisOpenid = Redis::get('country:openid:' . $mid);      //获得当前的用户在哪个村的小程序
-            $openid = $redisOpenid ? $redisOpenid : $memberOauth->openid;
+            $openid = $redisOpenid ? $redisOpenid : $memberOauth->openid2;
 
             $weChatPay = new Wechatpay();
             $prepay_ver = $weChatPay->getXcxPrePayOrder($appId, $Order->title, $Order->trade_no, $Order->price * 100, $openid, 'public/api/order/orderWxpaynotify');

@@ -200,6 +200,7 @@ class MemberController extends BaseController
                     MemberOauth::addMemberOauth($data['uid'], $mid);
                 }
             }
+            Redis::set('country:openid:' . $mid, $data['uid']);  //指定当前的用户在哪个村的小程序
 
             $minfo = Member::getMemberById($mid);
             $member = $minfo->toarray();
