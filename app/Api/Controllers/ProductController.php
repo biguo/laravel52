@@ -16,13 +16,15 @@ class ProductController extends BaseController
         $products = Country::current()->usedProduct()->toarray();
         $chosen = [];
         foreach ($products as $key => $data) {
-            $data['items'] = Item::from('item as i')->join('product_item as r','i.id','=','r.item_id')->where('r.product_id', $data['id'])->select('title','description')->get()->toArray();
-            $data['rules'] = Item::from('rule as i')->join('product_rule as r','i.id','=','r.rule_id')->where('r.product_id', $data['id'])->select('title','description')->get()->toArray();
-            if(isset($idx) && ($idx == $key)){
-                $chosen = $data;
-                break;
-            }else{
-                $chosen[] = $data;
+            if($data['id'] !== Youth){
+                $data['items'] = Item::from('item as i')->join('product_item as r','i.id','=','r.item_id')->where('r.product_id', $data['id'])->select('title','description')->get()->toArray();
+                $data['rules'] = Item::from('rule as i')->join('product_rule as r','i.id','=','r.rule_id')->where('r.product_id', $data['id'])->select('title','description')->get()->toArray();
+                if(isset($idx) && ($idx == $key)){
+                    $chosen = $data;
+                    break;
+                }else{
+                    $chosen[] = $data;
+                }
             }
         }
         return responseSuccess($chosen);

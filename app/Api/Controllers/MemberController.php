@@ -5,9 +5,11 @@ namespace App\Api\Controllers;
 use App\Models\AccountRecord;
 use App\Models\Card;
 use App\Models\Country;
+use App\Models\InviteCode;
 use App\Models\Member;
 use App\Models\MemberOauth;
 use App\Models\Order;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
@@ -176,7 +178,20 @@ class MemberController extends BaseController
             $res = $smscode->checkSmsCode($data['phone'], $data['vercode'], SmsCodeType_REGISTER);
             if (IS_STRING($res))
                 return responseError($res, $data);
+            $InviteFlag = false;
             $member = Member::getMemberByPhone($data['phone']);
+            if(isset($data['code'])){
+                $InviteCode = InviteCode::where('code',$data['code'])->first();
+                if(! $InviteCode){
+                    return responseError('邀请码不正确');
+                }else{
+                    if($InviteCode -> times > 0){
+                        $InviteFlag = true;   #表示是受到邀请
+                    }else{
+                        return responseError('邀请次数满了');
+                    }
+                }
+            }
 
             if (!$member) {
                 //新建用户
@@ -201,6 +216,18 @@ class MemberController extends BaseController
                 }
             }
             Redis::set('country:openid:' . $mid, $data['uid']);  //指定当前的用户在哪个村的小程序
+
+            if($InviteFlag){  #表示是受到邀请
+                $member->orders()->delete();
+                $product = Product::getById(Youth); #青年券
+                $data = array_only($product->toarray(), ['title', 'price', 'will_refund', 'image', 'icon','saved', 'country_id', 'weekend', 'unuse_image', 'used_image']);
+                $data = array_merge($data, ['product_id' => $product->id, 'mid' => $mid, 'trade_no' => 'Add' . StrOrderOne()]);
+                $order = Order::create($data);
+                $order->status = Status_Payed;
+                $order->save();
+                $InviteCode->times = $InviteCode->times-1;
+                $InviteCode->save();
+            }
 
             $minfo = Member::getMemberById($mid);
             $member = $minfo->toarray();

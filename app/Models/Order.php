@@ -90,7 +90,7 @@ class Order extends Model
             }
 
             $memberOauth = MemberOauth::getMemberOauthByMid($mid);
-            if ((!$memberOauth) || (!$memberOauth->openid2)) {
+            if ((!$memberOauth)) {
                 return responseError("未绑定openid");
             }
 
