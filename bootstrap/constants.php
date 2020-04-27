@@ -25,7 +25,7 @@ define('Default_Icon','http://upload.binghuozhijia.com/image/pt.jpg');//默认�
 define('Default_Pic','http://bhzj.binghuozhijia.com/test/bhzj/public/sample/default_pic.png');//默认头像
 define('wanted','http://upload.binghuozhijia.com/uploads/5e71b0619c92e/5e71b0619c8d5.jpg');
 
-define('Youth',7);//青年券产品的id  随着数据库的改变 可能会变
+define('Youth',27);//青年券产品的id  随着数据库的改变 可能会变
 
 
 
