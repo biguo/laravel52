@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Extensions\CustomExporter;
 use App\Models\Order;
 
 use Encore\Admin\Auth\Database\Administrator;
@@ -91,6 +92,9 @@ class OrderController extends Controller
             });
             $grid->created_at();
 //            $grid->updated_at();
+            $rows = ['id','phone','trade_no','title','price','status','paytradeno','paytime','created_at','updated_at'];
+            $map = ['status' => ['1' => '待支付', '2' => '已支付', '4' => '已取消', '5' => '已退款', '6' => '已使用']];
+            $grid->exporter(new CustomExporter($rows , $map));
             $grid->filter(function ($filter) {
 //                $filter->useModal();
                 $filter->disableIdFilter();
