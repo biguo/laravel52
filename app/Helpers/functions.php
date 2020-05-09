@@ -102,7 +102,7 @@ function gettoken($appid, $force = false)
         $para = array(
             "grant_type" => "client_credential",
             "appid" => $appid,
-            "secret" => env('SECRET')
+            "secret" => 'd38b3d3ab1194bc17dd26b0faf4917f1'
         );
         $url = "https://api.weixin.qq.com/cgi-bin/token";
         $url = $url . '?' . http_build_query($para);

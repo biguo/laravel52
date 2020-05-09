@@ -19,6 +19,7 @@ class MemberOauth extends Model
         $num = self::where($data)->count();
         if ($num > 0)
             return responseErrorArr('注册失败，请联系客服');
+        $data['project'] = '乡村民宿';
         $res = self::insert($data);
         if ($res) {
             return responseSuccessArr('成功');

@@ -37,9 +37,14 @@ class CommonController extends BaseController
     }
 
 
+    /**
+     * 分享二维码
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function shareXcx(Request $request)
     {
-        $pphone = $this->request->input('pphone');
+        $pphone = $request->input('pphone');
         if (!$pphone) {
             return responseError('请输入推荐手机号');
         }
@@ -53,7 +58,7 @@ class CommonController extends BaseController
         $url = $redis->get($cachename);
         if (!$url) {
             $interface = 'https://api.weixin.qq.com/wxa/getwxacodeunlimit';
-            $Data = array('scene' => 'pphone=' . $pphone);
+            $Data = array('scene' =>  $pphone, 'page' => 'pages/index/bindphone/bindPhone');
             $dd = postWeixinInterface($interface, $Data, $appid);
             $url = (new FileModel())->uploadStream($dd, 'erwm.png');
             if (!$url) {

@@ -50,6 +50,7 @@ class Member extends Authenticatable implements JWTSubject
         $data['headpic'] = isset($data['headpic']) ? $data['headpic'] : Default_Pic;
         $data['regtime'] = date('Y-m-d H:i:s', time());
         $data['regip'] = $_SERVER['SERVER_ADDR'];
+        $data['pid'] = (isset($data['pphone']) && trim($data['pphone']) !='' && self::where('phone', $data['pphone'])->value('id')) ? self::where('phone', $data['pphone'])->value('id') : 0;
         $data = array_except($data, ['vercode', 'pphone', 'uid']);
         $mid = self::insertGetId($data);
         return $mid;
