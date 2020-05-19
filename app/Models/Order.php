@@ -141,6 +141,7 @@ class Order extends Model
             $order->paytime = $object->time_end;
             $save = $order->save();
             $array = array_only(array_merge($order->toarray(), object_array($object)), ['trade_no', 'title', 'mid', 'total_fee', 'country_id']);
+            $array['total_fee'] = round($array['total_fee']/100,2);
             $record = AccountRecord::create($array);
             $this->prepareCard($order);
             if ($save && $record) {
