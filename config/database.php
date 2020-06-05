@@ -68,10 +68,10 @@ return [
 
         'original' => [
             'driver' => 'mysql',
-            'host' => '139.196.176.134',
+            'host' => '106.15.127.206',
             'port' => '3306',
             'database' => 'iceland',
-            'username' => 'root',
+            'username' => 'bhzj',
             'password' => 'bhzj123456?',
             'charset' => 'utf8',
             'collation' => 'utf8_unicode_ci',

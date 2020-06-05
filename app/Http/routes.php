@@ -51,6 +51,7 @@ $api->version('v1', ['namespace' => 'App\Api\Controllers'], function ($api) {
     $api->post('order/Refund', 'OrderController@Refund');  //退款
 
     $api->get('getCityAndArea','CommonController@getCityAndArea'); //省市区
+    $api->any('wx/getMediaId','WeixinController@getMediaId'); //上传媒介到小程序后台 获得新增的临时素材
 
 });
 
