@@ -81,6 +81,9 @@ function doCurlPostRequest($url, $requestString, $headertype = '', $timeout = 10
     if ('xml' == $headertype) {
         $header[] = "Content-Type: text/xml";
         curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
+    }elseif('json' == $headertype){
+        $header[] = "Content-Type: application/json";
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
     }
     $output = curl_exec($curl);
     curl_close($curl);
