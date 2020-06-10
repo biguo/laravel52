@@ -18,4 +18,5 @@ Route::group([
 //    $router->resource('house', HouseController::class);
     $router->resource('item', ItemController::class);
     $router->resource('rule', RuleController::class);
+    $router->resource('video', VideoController::class);
 });

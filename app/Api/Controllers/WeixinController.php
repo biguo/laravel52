@@ -125,6 +125,9 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
                 return responseError('请登录');
             }
             $all = $request->all();
+            if(isset($all['tags'])){
+                $all['tags'] = implode(',',$all['tags']);
+            }
             $all['mid'] = $mid;
             $all['project'] = '乡村民宿';
             $res = Video::create($all);
