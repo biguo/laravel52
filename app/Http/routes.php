@@ -56,5 +56,8 @@ $api->version('v1', ['namespace' => 'App\Api\Controllers'], function ($api) {
     $api->any('wx/getLiveInfo','WeixinController@getLiveInfo'); //【获取直播房间列表】接口
     $api->any('wx/getReplay','WeixinController@getReplay'); //【获取回放源视频】接口
 
+    $api->any('wx/UploadVideo','WeixinController@UploadVideo'); // 上传视频
+    $api->any('wx/VideoList','WeixinController@VideoList'); // 视频列表
+
 });
 

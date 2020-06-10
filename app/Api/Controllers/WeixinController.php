@@ -2,6 +2,9 @@
 
 namespace App\Api\Controllers;
 
+use App\Models\Video;
+use App\Models\VideoLike;
+use Illuminate\Http\Request;
 
 class WeixinController extends BaseController   // 微信/小程序一系列接口 用于直播
 {
@@ -107,5 +110,40 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
         $ret = doCurlPostRequest($url, $json_data);
         print_r($ret);
     }
+
+    /**
+     * 上传视频接口
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function UploadVideo(Request $request)
+    {
+        if ($request->isMethod('POST')) {
+
+            $mid = $this->checkLogin($request);
+            if (!$mid) {
+                return responseError('请登录');
+            }
+            $all = $request->all();
+            $all['mid'] = $mid;
+            $all['project'] = '乡村民宿';
+            $res = Video::create($all);
+            $like['source_id'] = $res->id;
+            $like['mid'] = $mid;
+            VideoLike::create($like);
+            return responseSuccessArr('创建成功');
+        } else {
+            return responseError("不是post请求!!");
+        }
+    }
+
+    public function VideoList(Request $request)
+    {
+        $mid = $this->checkLogin($request);
+        $res = (new Video())->VideoPublishedList($mid);
+        return responseSuccessArr($res);
+    }
+
+
 
 }
