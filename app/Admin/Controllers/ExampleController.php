@@ -8,10 +8,19 @@ use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\ModelForm;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Input;
 
 class ExampleController extends Controller
 {
     use ModelForm;
+
+    public function changeStatus()
+    {
+        $input = Input::except('_token');
+        DB::table($input['table'])->where('id',$input['id'])->update(['status' => $input['status']]);
+        return responseSuccess($input);
+    }
 
     /**
      * Index interface.

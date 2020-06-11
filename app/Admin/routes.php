@@ -19,4 +19,5 @@ Route::group([
     $router->resource('item', ItemController::class);
     $router->resource('rule', RuleController::class);
     $router->resource('video', VideoController::class);
+    $router->any('changeStatus', 'ExampleController@changeStatus');
 });

@@ -17,6 +17,13 @@ define('Status_OrderUsed',6);//已使用
 define('Status_UnUse',0);//代金券 未使用
 define('Status_Used',1);//已使用
 
+define('Status_Created_video',0);//未上线
+define('Status_Online_video',1);//上线
+define('Status_Review_video',2);//审核中
+define('Status_Offline_video',3);//下线
+define('Status_Reject_video',4);//驳回
+
+
 define('Change_Recharge',1);//记录 充值
 define('Change_Consume',2);//消费
 
