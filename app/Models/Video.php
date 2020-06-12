@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Video extends Model
 {
@@ -13,7 +14,7 @@ class Video extends Model
     public function VideoPublishedList($mid = null)
     {
         $res =  self::from('video as v')->join('iceland.ice_member as m', 'v.mid','=','m.id')
-            ->select('v.*','m.nickname','m.phone','m.realname')
+            ->select('v.*','m.nickname','m.phone','m.realname','m.headpic', DB::raw('0 as height'))
             ->where([['v.status','=','1'],['v.project','=','乡村民宿']])
             ->orderBy('id', 'desc')->paginate(6);
         foreach ($res as $item){

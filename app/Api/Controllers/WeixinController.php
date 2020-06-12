@@ -126,7 +126,8 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
             }
             $all = $request->all();
             if(isset($all['tags'])){
-                $all['tags'] = implode(',',$all['tags']);
+                $tagArr = json_decode($all['tags'],true);
+                $all['tags'] = implode(',',$tagArr);
             }
             $all['mid'] = $mid;
             $all['project'] = '乡村民宿';
@@ -140,11 +141,37 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
         }
     }
 
+    /**
+     * 视频列表
+     * @param Request $request
+     * @return array
+     */
     public function VideoList(Request $request)
     {
         $mid = $this->checkLogin($request);
         $res = (new Video())->VideoPublishedList($mid);
         return responseSuccessArr($res);
+    }
+
+    /**
+     * 点赞/取消点赞视频
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function LikeVideo(Request $request)
+    {
+        $mid = $this->checkLogin($request);
+        $like['source_id'] = $request->get('source_id');
+        $like['mid'] = $mid;
+        $like['type'] = 1;
+        $first = VideoLike::where($like)->first();
+        if($first){
+            $first->delete();
+            return responseSuccess('取消成功');
+        }else{
+            VideoLike::create($like);
+            return responseSuccess('点赞成功');
+        }
     }
 
 

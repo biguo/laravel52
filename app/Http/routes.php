@@ -58,6 +58,7 @@ $api->version('v1', ['namespace' => 'App\Api\Controllers'], function ($api) {
 
     $api->any('wx/UploadVideo','WeixinController@UploadVideo'); // 上传视频
     $api->any('wx/VideoList','WeixinController@VideoList'); // 视频列表
+    $api->any('wx/LikeVideo','WeixinController@LikeVideo'); // 点赞/取消视频
 
 });
 
