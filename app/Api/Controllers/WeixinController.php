@@ -154,6 +154,19 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
     }
 
     /**
+     * 滑动加载视频列表
+     * @param Request $request
+     * @return array
+     */
+    public function VideoSlippingList(Request $request)
+    {
+        $mid = $this->checkLogin($request);
+        $res = (new Video())->VideoPopularityList($mid);
+        return responseSuccessArr($res);
+    }
+
+
+    /**
      * 点赞/取消点赞视频
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -174,41 +187,47 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
         }
     }
 
-
+    /**
+     * 获得标签
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getTags()
     {
-        $tagArr = [ '行在旅途' => [
-                'pic' => Upload_Domain.'uploads/5ee6cb73a2ccf/5ee6cb73a2ccc.jpg',
+        $tagArr = [[
+            'title' => '行在旅途',
+            'pic' => Upload_Domain . 'uploads/5ee6cb73a2ccf/5ee6cb73a2ccc.jpg',
+            'tags' => [
+                '呼吸自然',
+                '夏日避暑地',
+                '在美丽乡村当村民吧',
+                '旅途中的最美夜景',
+                '值得去的古镇乡村',
+                '拍照超美的打卡地',
+                '我的旅行vlog'
+            ]],
+            [
+                'title' => '美食推荐',
+                'pic' => Upload_Domain . 'uploads/5ee6cb77cf5f4/5ee6cb77cf5f2.jpg',
                 'tags' => [
-                    '呼吸自然' => '呼吸自然',
-                    '夏日避暑地' => '夏日避暑地',
-                    '在美丽乡村当村民吧' => '在美丽乡村当村民吧',
-                    '旅途中的最美夜景' => '旅途中的最美夜景',
-                    '值得去的古镇乡村' => '值得去的古镇乡村',
-                    '拍照超美的打卡地' => '拍照超美的打卡地',
-                    '我的旅行vlog' => '我的旅行vlog'
+                    '自然风味美食',
+                    '我的私家食堂',
+                    '当地才能吃到的美食',
+                    '家乡小吃我来pick',
+                    '浪漫约会餐',
+                    '最爱下午茶时光',
+                    '这个酒吧有点燃'
                 ]],
-            '美食推荐' => [
-                'pic' => Upload_Domain.'uploads/5ee6cb77cf5f4/5ee6cb77cf5f2.jpg',
+            [
+                'title' => '精彩民宿',
+                'pic' => Upload_Domain . 'uploads/5ee6cb7c871f3/5ee6cb7c871f1.jpg',
                 'tags' => [
-                    '自然风味美食' => '自然风味美食',
-                    '我的私家食堂' => '我的私家食堂',
-                    '当地才能吃到的美食' => '当地才能吃到的美食',
-                    '家乡小吃我来pick' => '家乡小吃我来pick',
-                    '浪漫约会餐' => '浪漫约会餐',
-                    '最爱下午茶时光' => '最爱下午茶时光',
-                    '这个酒吧有点燃' => '这个酒吧有点燃'
-                ]],
-            '精彩民宿' => [
-                'pic' => Upload_Domain.'uploads/5ee6cb7c871f3/5ee6cb7c871f1.jpg',
-                'tags' => [
-                    '轰趴必去的民宿啊' => '轰趴必去的民宿啊',
-                    '少女心爆棚的民宿' => '少女心爆棚的民宿',
-                    '乡村里的民宿' => '乡村里的民宿',
-                    '这些民宿风景真赞' => '这些民宿风景真赞',
-                    '和萌娃一起的亲子民宿' => '和萌娃一起的亲子民宿',
-                    '夏日度假避暑首选' => '夏日度假避暑首选',
-                    '性价比超高的民宿' => '性价比超高的民宿'
+                    '轰趴必去的民宿啊',
+                    '少女心爆棚的民宿',
+                    '乡村里的民宿',
+                    '这些民宿风景真赞',
+                    '和萌娃一起的亲子民宿',
+                    '夏日度假避暑首选',
+                    '性价比超高的民宿'
                 ]]
         ];
         return responseSuccess($tagArr);

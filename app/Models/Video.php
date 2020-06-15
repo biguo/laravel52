@@ -11,17 +11,49 @@ class Video extends Model
     protected $table = 'video';
     protected $guarded = [];
 
+    /**
+     * 列表 id倒排
+     * @param null $mid
+     * @return mixed
+     */
     public function VideoPublishedList($mid = null)
     {
-        $res =  self::from('video as v')->join('iceland.ice_member as m', 'v.mid','=','m.id')
-            ->select('v.*','m.nickname','m.phone','m.realname','m.headpic', DB::raw('0 as height'))
-            ->where([['v.status','=','1'],['v.project','=','乡村民宿']])
-            ->orderBy('id', 'desc')->paginate(6);
-        foreach ($res as $item){
+        return $this->VideoList($mid);
+    }
 
-            $item->url = Upload_Domain .$item->url;
-            $item->pic = Upload_Domain .$item->pic;
-            $item->like_count = VideoLike::where([['source_id','=',$item->id]])->count();
+
+    /**
+     * 滑动加载  按点赞数倒排
+     * @param null $mid
+     * @return mixed
+     */
+    public function VideoPopularityList($mid = null)
+    {
+        return $this->VideoList($mid, 10, 2);
+    }
+
+
+    public function VideoList($mid = null, $paginate = 6, $order_type = 1)
+    {
+        $query =  self::from('video as v')
+            ->LeftJoin('iceland.ice_member as m', 'v.mid','=','m.id')
+            ->LeftJoin('video_like as l', 'v.id','=','l.source_id')
+            ->select('v.id','v.title','v.tags',
+                DB::raw("CONCAT('".Upload_Domain."',v.url) as url"),
+                DB::raw("CONCAT('".Upload_Domain."',v.pic) as pic"),
+                DB::raw("IFNULL(m.nickname,'冰火之家') as  nickname"),
+                DB::raw("IFNULL(m.headpic,'http://upload.binghuozhijia.com/uploads/5ee728f948579/5ee728f948576.jpg') as headpic"),
+                DB::raw("COUNT(l.id) as like_count"),
+                DB::raw('0 as height'))
+            ->where([['v.status','=','1'],['v.project','=','乡村民宿']])
+            ->groupBy('v.id');
+        if($order_type === 1){
+            $res = $query->orderBy('id', 'desc')->paginate($paginate);
+        }else if($order_type === 2 ){
+            $res = $query->orderBy(DB::raw("COUNT(l.id) "), 'desc')->paginate($paginate);
+        }
+
+        foreach ($res as $item){
             $item->like = 0;
             $item->tags = ($item->tags)? explode(',',$item->tags): [];
             if($mid){
@@ -32,6 +64,9 @@ class Video extends Model
             }
         }
         return $res;
-
     }
+
+
+
+
 }
