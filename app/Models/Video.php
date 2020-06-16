@@ -27,13 +27,13 @@ class Video extends Model
      * @param null $mid
      * @return mixed
      */
-    public function VideoPopularityList($mid = null)
+    public function VideoPopularityList($mid = null, $source_id = null)
     {
-        return $this->VideoList($mid, 10, 2);
+        return $this->VideoList($mid, 10, 2, $source_id);
     }
 
 
-    public function VideoList($mid = null, $paginate = 6, $order_type = 1)
+    public function VideoList($mid = null, $paginate = 6, $order_type = 1, $source_id = null)
     {
         $query =  self::from('video as v')
             ->LeftJoin('iceland.ice_member as m', 'v.mid','=','m.id')
@@ -50,6 +50,9 @@ class Video extends Model
         if($order_type === 1){
             $res = $query->orderBy('id', 'desc')->paginate($paginate);
         }else if($order_type === 2 ){
+            if($source_id){
+                $query = $query->orderBy(DB::raw("if(v.id =$source_id, 2, 1)"), 'desc');
+            }
             $res = $query->orderBy(DB::raw("COUNT(l.id) "), 'desc')->paginate($paginate);
         }
 

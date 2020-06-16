@@ -161,7 +161,7 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
     public function VideoSlippingList(Request $request)
     {
         $mid = $this->checkLogin($request);
-        $res = (new Video())->VideoPopularityList($mid);
+        $res = (new Video())->VideoPopularityList($mid, $request->get('source_id'));
         return responseSuccessArr($res);
     }
 
