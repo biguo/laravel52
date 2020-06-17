@@ -13,10 +13,11 @@ class ProductController extends BaseController
     public function getList(Request $request)
     {
         $idx = Input::get('index');
-        $products = Country::current()->usedProduct()->toarray();
+        $price = Input::get('price', false);
+
+        $products = Country::current()->usedProduct($price)->toarray();
         $chosen = [];
         foreach ($products as $key => $data) {
-            if($data['id'] !== Youth){
                 $data['items'] = Item::from('item as i')->join('product_item as r','i.id','=','r.item_id')->where('r.product_id', $data['id'])->select('title','description')->get()->toArray();
                 $data['rules'] = Item::from('rule as i')->join('product_rule as r','i.id','=','r.rule_id')->where('r.product_id', $data['id'])->select('title','description')->get()->toArray();
                 if(isset($idx) && ($idx == $key)){
@@ -25,7 +26,6 @@ class ProductController extends BaseController
                 }else{
                     $chosen[] = $data;
                 }
-            }
         }
         return responseSuccess($chosen);
     }

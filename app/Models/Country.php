@@ -42,11 +42,15 @@ class Country extends Model
         return $this->hasMany(Product::class);
     }
 
-    public function usedProduct()
+    public function usedProduct($price = false)
     {
-        return $this->products()->where('status', Status_Online)
-            ->select('id', 'title','price','promotional_price',DB::raw("concat('" . Upload_Domain . "', image) as image"),DB::raw("concat('" . Upload_Domain . "', icon) as icon"))
-            ->orderBy('sort', 'asc')->get();
+        $query =  $this->products()->where('status', Status_Online)
+            ->select('id', 'title','price','promotional_price',DB::raw("concat('" . Upload_Domain . "', image) as image"),DB::raw("concat('" . Upload_Domain . "', icon) as icon"));
+        if($price){
+            $query = $query->orderBy(DB::raw("if(price =$price, 2, 1)"), 'desc');
+        }
+        $res = $query->orderBy('sort', 'asc')->get();
+        return $res;
     }
 
     public function orders()
