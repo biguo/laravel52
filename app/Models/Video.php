@@ -41,7 +41,7 @@ class Video extends Model
             ->select('v.id','v.title','v.tags',
                 DB::raw("CONCAT('".Upload_Domain."',v.url) as url"),
                 DB::raw("CONCAT('".Upload_Domain."',v.pic) as pic"),
-                DB::raw("IFNULL(m.nickname,'冰火之家') as  nickname"),
+                DB::raw("IFNULL(m.nickname,'冰火乡村') as  nickname"),
                 DB::raw("IFNULL(m.headpic,'http://upload.binghuozhijia.com/uploads/5ee83b780a3fd/5ee83b780a3fb.jpg') as headpic"),
                 DB::raw("COUNT(l.id) as like_count"),
                 DB::raw('0 as height'))

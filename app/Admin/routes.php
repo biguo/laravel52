@@ -19,5 +19,7 @@ Route::group([
     $router->resource('item', ItemController::class);
     $router->resource('rule', RuleController::class);
     $router->resource('video', VideoController::class);
+    $router->any('streamer/{id}/show', 'StreamerController@show');  //查看
+    $router->resource('streamer', StreamerController::class);
     $router->any('changeStatus', 'ExampleController@changeStatus');
 });

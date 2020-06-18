@@ -11,13 +11,15 @@ class CustomerSwitch
     protected $baseStatus;
     protected $id;
     protected $status;
+    protected $table;
 
-    public function __construct($id, $status, $toStatus, $baseStatus)
+    public function __construct($id, $status, $toStatus, $baseStatus, $table)
     {
         $this->id = $id;
         $this->status = $status;
         $this->toStatus = $toStatus;
         $this->baseStatus = $baseStatus;
+        $this->table = $table;
     }
 
     protected function script()
@@ -25,6 +27,7 @@ class CustomerSwitch
         $jsScript = "let toStatus = " . json_encode($this->toStatus) . ";";
         $jsScript .= "let baseStatus = " . json_encode($this->baseStatus) . ";";
         $jsScript .= "let csrf_token = '" . csrf_token() . "';";
+        $jsScript .= "let table = '" . $this->table . "';";
         $jsScript .= <<<SCRIPT
 
         $(document).on('click', '.changeStatus', function(e) {
@@ -38,7 +41,7 @@ class CustomerSwitch
         function changeStatus(to, obj, id) {
             $.ajax({
                 type: "GET",
-                url:"changeStatus?table=video&id="+ id+"&_token="+ csrf_token +"&status="+ to,
+                url:"changeStatus?table=" + table + "&id="+ id+"&_token="+ csrf_token +"&status="+ to,
                 dataType:'json',
                 success:function (data) {
                     if(data.code === "200"){

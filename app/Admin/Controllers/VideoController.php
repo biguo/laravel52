@@ -96,7 +96,7 @@ class VideoController extends Controller
                     '3' => '已下线',
                     '4' => '驳回'
                 ];
-                return (new CustomerSwitch($this->id, $this->status, $toStatus,$baseStatus ))->render();
+                return (new CustomerSwitch($this->id, $this->status, $toStatus,$baseStatus ,'video'))->render();
             });
             $grid->created_at();
             $grid->updated_at();

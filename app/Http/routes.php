@@ -51,6 +51,8 @@ $api->version('v1', ['namespace' => 'App\Api\Controllers'], function ($api) {
     $api->post('order/Refund', 'OrderController@Refund');  //退款
 
     $api->get('getCityAndArea','CommonController@getCityAndArea'); //省市区
+
+    $api->any('wx/applyStreamer','WeixinController@applyStreamer'); // 申请直播者资质
     $api->any('wx/getMediaId','WeixinController@getMediaId'); //上传媒介到小程序后台 获得新增的临时素材
     $api->any('wx/CreateLiveRoom','WeixinController@CreateLiveRoom'); //【创建直播间】接口
     $api->any('wx/getLiveInfo','WeixinController@getLiveInfo'); //【获取直播房间列表】接口

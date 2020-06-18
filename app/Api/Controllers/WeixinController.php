@@ -2,12 +2,41 @@
 
 namespace App\Api\Controllers;
 
+use App\Models\Member;
+use App\Models\Streamer;
 use App\Models\Video;
 use App\Models\VideoLike;
 use Illuminate\Http\Request;
 
 class WeixinController extends BaseController   // 微信/小程序一系列接口 用于直播
 {
+
+    public function applyStreamer(Request $request)
+    {
+        if ($request->isMethod('POST')) {
+
+            $mid = $this->checkLogin($request);
+            if (!$mid) {
+                return responseError('请登录');
+            }
+            $member = Member::find($mid);
+            if (!$member) {
+                return responseError('请注册绑定');
+            }
+            $streamer = Streamer::where('mid',$mid)->whereIn('status', [Status_Online_streamer, Status_Real_streamer])->first();
+            if($streamer){
+                return responseError("您已经通过了");
+            }
+            $names = ['realname', 'nickname'];
+            $member->update($request->only($names));
+            $all = $request->except($names);
+            $all['mid'] = $mid;
+            Streamer::create($all);
+            return responseSuccessArr('创建成功');
+        } else {
+            return responseError("不是post请求!!");
+        }
+    }
 
     /**
      * 获得新增的临时素材

@@ -31,7 +31,11 @@ define('Default_Icon','http://upload.binghuozhijia.com/image/pt.jpg');//默认�
 define('Default_Pic','http://bhzj.binghuozhijia.com/test/bhzj/public/sample/default_pic.png');//默认头像
 define('wanted','http://upload.binghuozhijia.com/uploads/5e71b0619c92e/5e71b0619c8d5.jpg');
 
-define('Youth',27);//青年券产品的id  随着数据库的改变 可能会变
+define('Status_Online_streamer',1);//上线
+define('Status_Review_streamer',2);//审核中
+define('Status_Offline_streamer',3);//下线
+define('Status_Reject_streamer',4);//驳回
+define('Status_Real_streamer',5);//实名
 
 
 
