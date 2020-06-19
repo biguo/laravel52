@@ -84,4 +84,8 @@ class CommonController extends BaseController
         $pid = $request->get('id');
         return responseSuccess(DB::connection('original')->table("districts")->where("pid","=",$pid)->select("id","name as text")->get());
     }
+
+    public function testSMS(){
+        (new SmsCode())->SendYunmsg('15062314180', '550880');
+    }
 }

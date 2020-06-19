@@ -33,6 +33,29 @@ class StreamerController extends Controller
             $content->description('description');
 
             $content->body($this->grid());
+            $str = '<div class="modal fade" id="refuseModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <form class="form-inline" method="get" id="modalForm" action="'. URL('admin/changeStatus') .'">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <input type="hidden" id="modal-id" name="id" value="">
+                            <input type="hidden" id="modal-status" name="status" value="4">
+                            <h4 class="modal-title" id="myModalLabel" style="font-weight: 600;font-size:16px">不通过理由</h4>
+                        </div>
+                        <div class="modal-body">
+                            <textarea id="modal-reason" name="refuse_reason"  cols="70" rows="7"></textarea>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                            <button type="button" class="btn btn-primary msbtn">提交更改</button>
+                        </div>
+                    </div><!-- /.modal-content -->
+                </div><!-- /.modal -->
+            </form>
+        </div>';
+            $content->body($str);
+
         });
     }
 
@@ -131,13 +154,14 @@ class StreamerController extends Controller
                     '1' => ['3' => '下线','5' => '实名'],
                     '2' => ['1' => '通过', '4' => '驳回'],
                     '3' => ['1' => '上线'],
+                    '4' => ['1' => '审核'],
                     '5' => ['1' => '取消实名'],
                 ];
                 $baseStatus = [
                     '1' => '上线中',
                     '2' => '提交审核中',
                     '3' => '已下线',
-                    '4' => '驳回',
+                    '4' => '已驳回',
                     '5' => '已实名'
                 ];
                 return (new CustomerSwitch($this->id, $this->status, $toStatus,$baseStatus, 'streamer'))->render();

@@ -108,7 +108,7 @@ class SmsCode
     }
 
     #云之讯
-    public function SendYunmsg($phone, $templateId, $param)
+    public function SendYunmsg($phone, $templateId, $param = null)
     {
         $options['accountsid'] = $this->accountsid;
         $options['token'] = $this->token;
