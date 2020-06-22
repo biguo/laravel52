@@ -17,7 +17,7 @@ use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\Input;
 
 
-class StreamerController extends Controller
+class LiveApplyController extends Controller
 {
     use ModelForm;
 
@@ -30,7 +30,7 @@ class StreamerController extends Controller
     {
         return Admin::content(function (Content $content) {
 
-            $content->header('直播资质申请');
+            $content->header('直播房间申请');
             $content->description('description');
 
             $content->body($this->grid());
@@ -70,19 +70,28 @@ class StreamerController extends Controller
     {
         return Admin::content(function (Content $content) use ($id) {
 
-            $content->header('直播资质详情');
+            $content->header('直播房间详情');
             $content->description('description');
 
-            $show = Admin::form(Streamer::class, function (Form $form) use ($id) {
-                $Streamer = Streamer::find($id);
+            $show = Admin::form(LiveApply::class, function (Form $form) use ($id) {
+                $LiveApply = LiveApply::find($id);
+                $Streamer = Streamer::find($LiveApply->streamer_id);
                 $Member = Member::find($Streamer->mid);
+
+                $interface = 'https://api.weixin.qq.com/cgi-bin/media/get?access_token=';
+                $token = gettoken('wxdfe1d168b25d4fff');
+                $shareImg = "<img src='".$interface . $token . "&media_id=" . $LiveApply->shareImg."' style='max-width:100px;max-height:100px' class='img img-thumbnail' />";
+                $coverImg = "<img src='".$interface . $token . "&media_id=" . $LiveApply->coverImg."' style='max-width:100px;max-height:100px' class='img img-thumbnail' />";
+
                 $form->display('id', 'ID');
                 $form->display('phone', '手机号')->default($Member->phone);
-                $form->display('nickname', '昵称')->default($Member->nickname);
-                $form->display('realname', '姓名')->default($Member->realname);
-                $form->display('type', '类型');
-                $form->display('experience', '经验');
-                $form->display('introduce', '介绍');
+                $form->display('nickname', '主播昵称')->default($Member->nickname);
+                $form->display('wechat','主播微信号')->default($Streamer->wechat);
+                $form->display('name', '房间名字');
+                $form->html($shareImg, '直播间分享图');
+                $form->html($coverImg, '直播间背景图');
+                $form->display('startTime1', '直播计划开始时间')->default(date("Y-m-d H:i:s",$LiveApply->startTime));
+                $form->display('endTime1', '直播计划结束时间')->default(date("Y-m-d H:i:s",$LiveApply->endTime));
                 $form->tools(function (Form\Tools $tools) {
                     $tools->disableListButton();
                 });
@@ -99,11 +108,13 @@ class StreamerController extends Controller
      */
     protected function grid()
     {
-        return Admin::grid(Streamer::class, function (Grid $grid) {
-            $grid->model()->from('streamer as s')
-                ->Leftjoin('iceland.ice_member as m', 'm.id', '=', 's.mid')
-                ->select('s.*', 'm.phone', 'm.nickname', 'm.realname')
-                ->whereNotIn('s.status', [Status_Reject_streamer])->orderBy('s.id', 'desc');
+        return Admin::grid(LiveApply::class, function (Grid $grid) {
+            $grid->model()->from('live_apply as a')
+                ->Leftjoin('streamer as s', 'a.streamer_id', '=', 's.id')
+                ->Leftjoin('iceland.ice_member as m', 'm.id', '=', 'a.mid')
+                ->select('a.*', 'm.phone', 'm.nickname','s.wechat','s.status as sstatus', 's.wechat')
+
+                ->orderBy('s.id', 'desc');
 
             $grid->disableExport();
             $grid->disableRowSelector();
@@ -111,33 +122,35 @@ class StreamerController extends Controller
 
             $grid->id('ID')->sortable();
             $grid->column('phone', '手机号');
-            $grid->column('nickname', '昵称');
-            $grid->column('realname', '名字');
-            $grid->column('type', '类型');
-            $grid->column('experience', '经验');
-            $grid->column('introduce', '介绍');
-
-            $grid->column('状态')->display(function () {
-                $toStatus = [
-                    '1' => ['3' => '下线','5' => '实名'],
-                    '2' => ['1' => '通过', '4' => '驳回'],
-                    '3' => ['1' => '上线'],
-                    '4' => ['1' => '审核'],
-                    '5' => ['1' => '取消实名'],
-                ];
+            $grid->column('nickname', '主播昵称');
+            $grid->column('wechat', '主播微信号');
+            $grid->column('sstatus', '主播状态')->display(function ($sstatus) {
                 $baseStatus = [
-                    '1' => '上线中',
+                    '1' => '上线中(未实名)',
                     '2' => '提交审核中',
                     '3' => '已下线',
                     '4' => '已驳回',
                     '5' => '已实名'
                 ];
-                return (new CustomerSwitch($this->id, $this->status, $toStatus,$baseStatus, 'streamer'))->render();
+                return $baseStatus[$sstatus];
+            });
+//            1 通过  2 申请中  4 驳回
+            $grid->column('状态')->display(function () {
+                $toStatus = [
+                    '2' => ['1' => '通过', '4' => '驳回'],
+                    '4' => ['2' => '审核']
+                ];
+                $baseStatus = [
+                    '1' => '已通过',
+                    '2' => '申请中',
+                    '4' => '驳回'
+                ];
+                return (new CustomerSwitch($this->id, $this->status, $toStatus,$baseStatus, 'live_apply'))->render();
             });
             $grid->created_at();
             $grid->updated_at();
             $grid->actions(function ($actions) {
-                $actions->append('<a class="btn btn-sm btn-primary" href="'.admin_url('streamer').'/'.$actions->getKey().'/show"> 查看</a>');
+                $actions->append('<a class="btn btn-sm btn-primary" href="'.admin_url('LiveApply').'/'.$actions->getKey().'/show"> 查看</a>');
                 $actions->disableDelete();
                 $actions->disableEdit();
             });

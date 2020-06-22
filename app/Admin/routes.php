@@ -21,5 +21,7 @@ Route::group([
     $router->resource('video', VideoController::class);
     $router->any('streamer/{id}/show', 'StreamerController@show');  //查看
     $router->resource('streamer', StreamerController::class);
+    $router->any('LiveApply/{id}/show', 'LiveApplyController@show');  //查看
+    $router->resource('LiveApply', LiveApplyController::class);
     $router->any('changeStatus', 'ExampleController@changeStatus');
 });

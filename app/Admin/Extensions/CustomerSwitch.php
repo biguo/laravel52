@@ -88,13 +88,15 @@ class CustomerSwitch
         }
 
         function changeButton(num, obj, id){
-            let barr = toStatus[num];
-            let str = '<div style="font-size: 18px" id="div_'+ id +'">' +  baseStatus[num] + '</div>';
-            for (let item in barr){
-                let target = item === '4' ? ' data-toggle="modal"  data-target="#refuseModal"':'';
-                str += '<div class="changeStatus" data-to="'+ item +'" data-id="'+ id +'"  style="cursor:pointer" '+ target +' >'+ barr[item] +'</div>'
+            if(toStatus[num] !== undefined){
+                let barr = toStatus[num];
+                let str = '<div style="font-size: 18px" id="div_'+ id +'">' +  baseStatus[num] + '</div>';
+                for (let item in barr){
+                    let target = item === '4' ? ' data-toggle="modal"  data-target="#refuseModal"':'';
+                    str += '<div class="changeStatus" data-to="'+ item +'" data-id="'+ id +'"  style="cursor:pointer" '+ target +' >'+ barr[item] +'</div>'
+                }
+                obj.html(str)
             }
-            obj.html(str)
         }
 SCRIPT;
         return $jsScript;
@@ -105,10 +107,12 @@ SCRIPT;
         Admin::js('/packages/layer-v3.1.1/layer/layer.js');
         Admin::script($this->script());
         $str = '<div style="font-size: 18px" id="div_'. $this->id .'">' . $this->baseStatus[$this->status] . '</div>';
-        $toArr = $this->toStatus[$this->status];
-        foreach ($toArr as $k => $v) {
-            $target = ($k === 4) ? ' data-toggle=modal  data-target=#refuseModal':'';
-            $str .= '<div class="changeStatus" data-to="' . $k . '" data-id="' . $this->id . '" style="cursor:pointer" '. $target .'>' . $v . '</div>';
+        if(isset($this->toStatus[$this->status])){
+            $toArr = $this->toStatus[$this->status];
+            foreach ($toArr as $k => $v) {
+                $target = ($k === 4) ? ' data-toggle=modal  data-target=#refuseModal':'';
+                $str .= '<div class="changeStatus" data-to="' . $k . '" data-id="' . $this->id . '" style="cursor:pointer" '. $target .'>' . $v . '</div>';
+            }
         }
         return $str;
     }
