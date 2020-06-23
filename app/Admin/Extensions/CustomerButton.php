@@ -25,6 +25,8 @@ class CustomerButton
         $jsScript .= <<<SCRIPT
 $('.customer').on('click', function () {
     let id = $(this).attr('data-id');
+
+    $(this).attr('disabled',true)
     
     $.ajax({
         type: "POST",
@@ -32,12 +34,16 @@ $('.customer').on('click', function () {
         url: url ,
         data: {_token:token,id:id},//传参
         success: function (data) {
+            $(".customer").attr('disabled',false)
             if(data.code === "200"){
                 layer.msg('操作完成');
                 window.location.reload();
             }else{
-                layer.msg('操作失败');
+                layer.msg(data.msg);
             }
+        },
+        error: function(){
+            $(".customer").attr('disabled',false)
         },
     });
     

@@ -197,7 +197,7 @@ class LiveApplyController extends Controller
             $LiveApply->save();
             return responseSuccess($ret);
         }else{
-            return responseError();
+            return responseError($ret['errmsg']);
         }
     }
 }
