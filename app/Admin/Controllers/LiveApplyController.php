@@ -3,6 +3,8 @@
 namespace App\Admin\Controllers;
 
 
+use App\Admin\Extensions\CheckRow;
+use App\Admin\Extensions\CustomerButton;
 use App\Admin\Extensions\CustomerSwitch;
 use App\Http\Controllers\Controller;
 use App\Models\LiveApply;
@@ -32,31 +34,7 @@ class LiveApplyController extends Controller
 
             $content->header('直播房间申请');
             $content->description('description');
-
             $content->body($this->grid());
-            $str = '<div class="modal fade" id="refuseModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-            <form class="form-inline" method="get" id="modalForm" action="'. URL('admin/changeStatus') .'">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                            <input type="hidden" id="modal-id" name="id" value="">
-                            <input type="hidden" id="modal-status" name="status" value="4">
-                            <h4 class="modal-title" id="myModalLabel" style="font-weight: 600;font-size:16px">不通过理由</h4>
-                        </div>
-                        <div class="modal-body">
-                            <textarea id="modal-reason" name="refuse_reason"  cols="70" rows="7"></textarea>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                            <button type="button" class="btn btn-primary msbtn">提交更改</button>
-                        </div>
-                    </div><!-- /.modal-content -->
-                </div><!-- /.modal -->
-            </form>
-        </div>';
-            $content->body($str);
-
         });
     }
 
@@ -79,11 +57,10 @@ class LiveApplyController extends Controller
                 $Member = Member::find($Streamer->mid);
 
                 $interface = 'https://api.weixin.qq.com/cgi-bin/media/get?access_token=';
-                $token = gettoken('wxdfe1d168b25d4fff');
+                $token = gettoken('wxdfe1d168b25d4fff',true);
                 $shareImg = "<img src='".$interface . $token . "&media_id=" . $LiveApply->shareImg."' style='max-width:100px;max-height:100px' class='img img-thumbnail' />";
                 $coverImg = "<img src='".$interface . $token . "&media_id=" . $LiveApply->coverImg."' style='max-width:100px;max-height:100px' class='img img-thumbnail' />";
 
-                $form->display('id', 'ID');
                 $form->display('phone', '手机号')->default($Member->phone);
                 $form->display('nickname', '主播昵称')->default($Member->nickname);
                 $form->display('wechat','主播微信号')->default($Streamer->wechat);
@@ -95,6 +72,30 @@ class LiveApplyController extends Controller
                 $form->tools(function (Form\Tools $tools) {
                     $tools->disableListButton();
                 });
+                $form->builder()->option('enableReset',0);  // 关闭reset按钮
+
+                $sstatus = $Streamer->status;
+                $streamerStatus = [
+                    '1' => '上线中(未实名)',
+                    '2' => '提交审核中',
+                    '3' => '已下线',
+                    '5' => '已实名'
+                ];
+                $form->display('status1', '主播状态')->default($streamerStatus[$sstatus]);
+
+                $status = $LiveApply->status;
+                $baseStatus = [
+                    '1' => '已通过',
+                    '2' => '申请中',
+                    '4' => '驳回'
+                ];
+
+                $form->display('status2', '审核状态')->default($baseStatus[$status]);
+
+                $passStreamer = ($Streamer->status !== 5) ? (new CustomerButton($id,'主播实名','/admin/streamerPass')) : '';
+                $passLiveApply = ($Streamer->status === 5) && ($LiveApply->status !== 1) ? (new CustomerButton($id,'开通房间','/admin/toLive')) : '';
+                $form->html($passStreamer . $passLiveApply);
+
             });
 
             $content->body($show->view($id));
@@ -122,6 +123,7 @@ class LiveApplyController extends Controller
 
             $grid->id('ID')->sortable();
             $grid->column('phone', '手机号');
+            $grid->column('name', '房间名字');
             $grid->column('nickname', '主播昵称');
             $grid->column('wechat', '主播微信号');
             $grid->column('sstatus', '主播状态')->display(function ($sstatus) {
@@ -134,19 +136,16 @@ class LiveApplyController extends Controller
                 ];
                 return $baseStatus[$sstatus];
             });
-//            1 通过  2 申请中  4 驳回
-            $grid->column('状态')->display(function () {
-                $toStatus = [
-                    '2' => ['1' => '通过', '4' => '驳回'],
-                    '4' => ['2' => '审核']
-                ];
+            $grid->column('status', '审批状态')->display(function ($status) {
                 $baseStatus = [
                     '1' => '已通过',
                     '2' => '申请中',
                     '4' => '驳回'
                 ];
-                return (new CustomerSwitch($this->id, $this->status, $toStatus,$baseStatus, 'live_apply'))->render();
+                return $baseStatus[$status];
             });
+            $grid->column('startTime', '直播计划开始时间')->display(function ($startTime) {return date("Y-m-d H:i:s",$startTime);});
+            $grid->column('endTime', '直播计划结束时间')->display(function ($endTime) {return date("Y-m-d H:i:s",$endTime);});
             $grid->created_at();
             $grid->updated_at();
             $grid->actions(function ($actions) {
@@ -157,4 +156,48 @@ class LiveApplyController extends Controller
         });
     }
 
+    /**
+     * 主播实名确认
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function pass()
+    {
+        $input = Input::except('_token');
+        $LiveApply = LiveApply::find($input['id']);
+        $Streamer = Streamer::find($LiveApply->streamer_id);
+        $Streamer->status = 5;
+        $Streamer->save();
+        return responseSuccess();
+    }
+
+
+    /**
+     * 开通直播房间
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function toLive()
+    {
+        $input = Input::except('_token');
+        $LiveApply = LiveApply::find($input['id']);
+        $Streamer = Streamer::find($LiveApply->streamer_id);
+        $Member = Member::find($LiveApply->mid);
+
+        $data = $LiveApply->toArray();
+        $data = array_except($data,['created_at', 'updated_at', 'id', 'mid', 'refuse_reason', 'status', 'streamer_id']);
+        $data = array_merge($data, ['anchorName' => $Member->nickname, 'anchorWechat' => $Streamer->wechat]);
+
+        $interface = 'https://api.weixin.qq.com/wxaapi/broadcast/room/create';
+        $token = gettoken('wxdfe1d168b25d4fff', true);
+        $url = $interface . "?access_token=" . $token;
+        $json_data = JSON($data);
+        $ret = doCurlPostRequest($url, $json_data, 'json');
+        $ret = json_decode($ret, true);
+        if($ret['errcode'] === 0){
+            $LiveApply->status = 1;
+            $LiveApply->save();
+            return responseSuccess($ret);
+        }else{
+            return responseError();
+        }
+    }
 }
