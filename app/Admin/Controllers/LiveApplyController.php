@@ -144,6 +144,15 @@ class LiveApplyController extends Controller
                 ];
                 return $baseStatus[$status];
             });
+            $grid->column('stage', '播放状态')->display(function ($stage) {
+                $baseStages = [
+                    '0' => '未直播',
+                    '1' => '已结束',
+                    '2' => '未开始',
+                    '3' => '已开始',
+                ];
+                return $baseStages[$stage];
+            });
             $grid->column('startTime', '直播计划开始时间')->display(function ($startTime) {return date("Y-m-d H:i:s",$startTime);});
             $grid->column('endTime', '直播计划结束时间')->display(function ($endTime) {return date("Y-m-d H:i:s",$endTime);});
             $grid->created_at();
@@ -189,25 +198,31 @@ class LiveApplyController extends Controller
     {
         $input = Input::except('_token');
         $LiveApply = LiveApply::find($input['id']);
-        $Streamer = Streamer::find($LiveApply->streamer_id);
-        $Member = Member::find($LiveApply->mid);
 
-        $data = $LiveApply->toArray();
-        $data = array_except($data,['created_at', 'updated_at', 'id', 'mid', 'refuse_reason', 'status', 'streamer_id']);
-        $data = array_merge($data, ['anchorName' => $Member->nickname, 'anchorWechat' => $Streamer->wechat]);
+        if($LiveApply->roomId === 0){
+            $Streamer = Streamer::find($LiveApply->streamer_id);
+            $Member = Member::find($LiveApply->mid);
 
-        $interface = 'https://api.weixin.qq.com/wxaapi/broadcast/room/create';
-        $token = gettoken('wxdfe1d168b25d4fff', true);
-        $url = $interface . "?access_token=" . $token;
-        $json_data = JSON($data);
-        $ret = doCurlPostRequest($url, $json_data, 'json');
-        $ret = json_decode($ret, true);
-        if($ret['errcode'] === 0){
-            $LiveApply->status = 1;
-            $LiveApply->save();
-            return responseSuccess($ret);
+            $data = $LiveApply->toArray();
+            $data = array_except($data,['created_at', 'updated_at', 'id', 'mid', 'refuse_reason', 'status', 'streamer_id']);
+            $data = array_merge($data, ['anchorName' => $Member->nickname, 'anchorWechat' => $Streamer->wechat]);
+
+            $interface = 'https://api.weixin.qq.com/wxaapi/broadcast/room/create';
+            $token = gettoken('wxdfe1d168b25d4fff', true);
+            $url = $interface . "?access_token=" . $token;
+            $json_data = JSON($data);
+            $ret = doCurlPostRequest($url, $json_data, 'json');
+            $ret = json_decode($ret, true);
+            if($ret['errcode'] === 0){
+                $LiveApply->status = 1;
+                $LiveApply->roomId = $ret['roomId'];
+                $LiveApply->save();
+                return responseSuccess($ret);
+            }else{
+                return responseError($ret['errmsg']);
+            }
         }else{
-            return responseError($ret['errmsg']);
+            return responseError('您已申请成功');
         }
     }
 }

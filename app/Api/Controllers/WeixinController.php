@@ -8,6 +8,7 @@ use App\Models\Streamer;
 use App\Models\Video;
 use App\Models\VideoLike;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redis;
 
 class WeixinController extends BaseController   // 微信/小程序一系列接口 用于直播
 {
@@ -58,7 +59,7 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
             $new_path = base_path('public') . DIRECTORY_SEPARATOR . 'upload' . DIRECTORY_SEPARATOR . 'image' . DIRECTORY_SEPARATOR . microtime(true) * 10000 . '.png';
             @file_put_contents($new_path, $img);
             $args['media'] = new \CurlFile($new_path);
-            $token = gettoken('wxdfe1d168b25d4fff',true);
+            $token = gettoken('wxdfe1d168b25d4fff', true);
             $url = "https://api.weixin.qq.com/cgi-bin/media/upload?access_token=" . $token . '&type=image';
             $curl = curl_init();//初始化
             curl_setopt($curl, CURLOPT_URL, $url);
@@ -146,7 +147,7 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
     }
 
     /**
-     *  获取直播房间列表
+     *  获取直播房间列表  作废
      */
     public function getLiveInfo()
     {
@@ -160,6 +161,43 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
         $json_data = JSON($data);
         $ret = doCurlPostRequest($url, $json_data);
         print_r($ret);
+    }
+
+    /**
+     *  获取直播房间列表
+     */
+    public function getLiveRoom(Request $request)
+    {
+        $mid = $this->checkLogin($request);
+        $pageStatus = 0;  # 是否进入过此页面 0 未 1 已  未登录默认未进入
+        $liveStatus = 0;  # 当事人申请直播的状态 0 没有瓜葛 1 已上线(未实名)  2 审核中 3已下线 4 已驳回 5 已实名
+        if ($mid) {
+            $redis = Redis::connection('default');
+            $cacheName = 'api_live:' . $mid;
+            if (!$redis->exists($cacheName)) {
+                $redis->set($cacheName, 1);
+            } else {
+                $pageStatus = 1;
+            }
+
+            if (Streamer::where('mid', $mid)->where('status', 5)->first()) {
+                $liveStatus = 5;
+            } elseif (Streamer::where('mid', $mid)->where('status', 1)->first()) {
+                $liveStatus = 1;
+            } elseif (Streamer::where('mid', $mid)->first()) {
+                $liveStatus = 2;
+            } else {
+                $liveStatus = 0;
+            }
+        }
+        $data['pageStatus'] = $pageStatus;
+        $data['liveStatus'] = $liveStatus;
+        $data['roomPic'] = 'https://www.baidu.com/img/PCtm_d9c8750bed0b3c7d089fa7d55720d6cf.png';
+        $data['Rooms'] = LiveApply::from('live_apply as a')
+            ->Leftjoin('iceland.ice_member as m', 'm.id', '=', 'a.mid')
+            ->select('a.name','a.stage','a.mid','a.streamer_id', 'a.coverImg', 'a.shareImg', 'a.startTime', 'a.endTime', 'm.nickname as anchor_name', 'm.headpic')
+            ->where('status', 1)->orderBy('stage', 'desc')->get();;
+        return responseSuccess($data);
     }
 
     /**
