@@ -136,6 +136,17 @@ class StreamerController extends Controller
             });
             $grid->created_at();
             $grid->updated_at();
+            $grid->filter(function ($filter) {
+                $filter->disableIdFilter();
+                $filter->like('phone', '手机号');
+                $filter->is('status', '状态')->select([
+                    '1' => '上线中',
+                    '2' => '提交审核中',
+                    '3' => '已下线',
+                    '4' => '已驳回',
+                    '5' => '已实名'
+                ]);
+            });
             $grid->actions(function ($actions) {
                 $actions->append('<a class="btn btn-sm btn-primary" href="'.admin_url('streamer').'/'.$actions->getKey().'/show"> 查看</a>');
                 $actions->disableDelete();

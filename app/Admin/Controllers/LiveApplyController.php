@@ -111,22 +111,22 @@ class LiveApplyController extends Controller
     {
         return Admin::grid(LiveApply::class, function (Grid $grid) {
             $grid->model()->from('live_apply as a')
-                ->Leftjoin('streamer as s', 'a.streamer_id', '=', 's.id')
                 ->Leftjoin('iceland.ice_member as m', 'm.id', '=', 'a.mid')
-                ->select('a.*', 'm.phone', 'm.nickname','s.wechat','s.status as sstatus', 's.wechat')
-
-                ->orderBy('s.id', 'desc');
+                ->select('a.*', 'm.phone', 'm.nickname')
+                ->orderBy('a.id', 'desc');
 
             $grid->disableExport();
             $grid->disableRowSelector();
             $grid->disableCreation();
-
             $grid->id('ID')->sortable();
             $grid->column('phone', '手机号');
             $grid->column('name', '房间名字');
             $grid->column('nickname', '主播昵称');
-            $grid->column('wechat', '主播微信号');
-            $grid->column('sstatus', '主播状态')->display(function ($sstatus) {
+            $grid->column('wechat', '主播微信号')->display(function (){
+                return Streamer::find($this->streamer_id)->value('wechat');
+            });
+            $grid->column('sstatus', '主播状态')->display(function () {
+                $sstatus = Streamer::find($this->streamer_id)->value('status');
                 $baseStatus = [
                     '1' => '上线中(未实名)',
                     '2' => '提交审核中',
@@ -148,6 +148,16 @@ class LiveApplyController extends Controller
             $grid->column('endTime', '直播计划结束时间')->display(function ($endTime) {return date("Y-m-d H:i:s",$endTime);});
             $grid->created_at();
             $grid->updated_at();
+
+            $grid->filter(function ($filter) {
+                $filter->disableIdFilter();
+                $filter->like('name', '房间名');
+                $filter->is('status', '状态')->select([
+                    '1' => '已通过',
+                    '2' => '申请中',
+                    '4' => '驳回'
+                ]);
+            });
             $grid->actions(function ($actions) {
                 $actions->append('<a class="btn btn-sm btn-primary" href="'.admin_url('LiveApply').'/'.$actions->getKey().'/show"> 查看</a>');
                 $actions->disableDelete();
