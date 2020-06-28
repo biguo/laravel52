@@ -172,7 +172,7 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
      */
     private function checkStage()
     {
-        $sql = "update live_apply set stage=(IF((unix_timestamp() > endTime),1,IF((unix_timestamp() < startTime),2,1))) where status=1";
+        $sql = "update live_apply set stage=(IF((unix_timestamp() > endTime),1,IF((unix_timestamp() < startTime),2,3))) where status=1";
         DB::update($sql);
     }
 
@@ -213,7 +213,7 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
         $data['roomPic'] = 'http://upload.binghuozhijia.com/uploads/5ef7f838611ae/5ef7f838611ac.jpg';
         $Rooms = LiveApply::from('live_apply as a')
             ->Leftjoin('iceland.ice_member as m', 'm.id', '=', 'a.mid')
-            ->select('a.name', 'a.stage', 'a.status', 'a.mid', 'a.streamer_id', 'a.coverImg', 'a.shareImg', 'a.startTime', 'a.endTime', 'm.nickname as anchor_name', 'm.headpic')
+            ->select('a.id','a.name', 'a.stage', 'a.status', 'a.mid', 'a.streamer_id', 'a.coverImg', 'a.shareImg', 'a.startTime', 'a.endTime', 'm.nickname as anchor_name', 'm.headpic')
             ->where('status', 1)->orderBy('stage', 'desc')->get();
         $stagePicArr = [
             '3' => ['pic' => 'http://upload.binghuozhijia.com/uploads/5ef7f017e96fd/5ef7f017e96fb.jpg', 'str' => '直播中'],
@@ -255,6 +255,15 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
 
         $Room = array_only($LiveApply->toarray(), $select);
         $Room['range'] = date("Y-m-d H:i:s", $LiveApply->startTime) . '至' . date("Y-m-d H:i:s", $LiveApply->endTime);
+
+        $stagePicArr = [
+            '3' => ['pic' => 'http://upload.binghuozhijia.com/uploads/5ef7f017e96fd/5ef7f017e96fb.jpg', 'str' => '直播中'],
+            '2' => ['pic' => 'http://upload.binghuozhijia.com/uploads/5ef7eff15bbe8/5ef7eff15bbe5.jpg', 'str' => '即将开始'],
+            '1' => ['pic' => 'http://upload.binghuozhijia.com/uploads/5ef7efc82343c/5ef7efc82343a.jpg', 'str' => '已结束'],
+            '0' => ['pic' => '', 'str' => '未通过'],
+        ];
+        $Room['stageStr'] = $stagePicArr[$LiveApply->stage]['str'];
+
         $data['info'] = $Room;
 
         $Streamer = Streamer::from('streamer as s')
