@@ -66,6 +66,7 @@ $api->version('v1', ['namespace' => 'App\Api\Controllers'], function ($api) {
     $api->any('wx/VideoSlippingList','WeixinController@VideoSlippingList'); // 滑动加载视频列表
     $api->any('wx/LikeVideo','WeixinController@LikeVideo'); // 点赞/取消视频
     $api->any('wx/getTags','WeixinController@getTags'); // 视频标签
+    $api->any('wx/pass','WeixinController@pass'); // 视频标签
 
 });
 

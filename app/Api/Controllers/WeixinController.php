@@ -302,6 +302,20 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
     }
 
     /**
+     * 主播实名确认
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function pass(Request $request)
+    {
+        $mid = $this->checkLogin($request);
+        $Streamer = Streamer::where('mid', $mid)->first();
+        $Streamer->status = 5;
+        $Streamer->save();
+        return responseSuccess();
+    }
+
+
+    /**
      * 上传视频接口
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
