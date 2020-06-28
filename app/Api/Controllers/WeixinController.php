@@ -118,8 +118,8 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
             if (!isset($params['title']) || strlen($params['title']) < 6) {
                 return responseError('请提供合适长度(6-34字节)的房间名称');
             }
-            $startTime = strtotime(strtotime($params['Date']) . '' . $params['startTime']);
-            $endTime = strtotime(strtotime($params['Date']) . '' . $params['startTime']);
+            $startTime = strtotime($params['Date'] . '' . $params['startTime']);
+            $endTime = strtotime($params['Date'] . '' . $params['endTime']);
             if ($startTime > $endTime) {
                 return responseError('开始时间须小于结束时间');
             }
@@ -130,8 +130,8 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
             $data = array(
                 "name" => $params['title'], //房间名字 最长17个汉字，1个汉字相当于2个字符
                 "coverImg" => $coverImg, //填写mediaID，直播间背景图，图片规则：建议像素1080*1920，大小不超过2M，mediaID获取参考：https://developers.weixin.qq.com/doc/offiaccount/Asset_Management/New_temporary_materials.html）
-                "startTime" => strtotime($params['startTime']),// 直播计划开始时间，1.开播时间需在当前时间10min后，2.开始时间不能在6个月后
-                "endTime" => strtotime($params['endTime']),  //直播计划结束时间，1.开播时间和结束时间间隔不得短于30min，不得超过12小时
+                "startTime" => $startTime,// 直播计划开始时间，1.开播时间需在当前时间10min后，2.开始时间不能在6个月后
+                "endTime" => $endTime,  //直播计划结束时间，1.开播时间和结束时间间隔不得短于30min，不得超过12小时
                 "mid" => $mid, // 主播昵称 最长15个汉字，1个汉字相当于2个字符
                 "streamer_id" => $streamer->id, //主播微信号，需通过实名认证，否则将报错
                 "shareImg" => $coverImg, //填写mediaID，直播间分享图，图片规则：建议像素800*640，大小不超过1M，mediaID获取参考：https://developers.weixin.qq.com/doc/offiaccount/Asset_Management/New_temporary_materials.html）
