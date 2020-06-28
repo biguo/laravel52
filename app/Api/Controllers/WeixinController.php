@@ -171,6 +171,7 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
         $mid = $this->checkLogin($request);
         $pageStatus = 0;  # 是否进入过此页面 0 未 1 已  未登录默认未进入
         $liveStatus = 0;  # 当事人申请直播的状态 0 没有瓜葛 1 已上线(未实名)  2 审核中 3已下线 4 已驳回 5 已实名
+        $liveStr = '未申请';
         if ($mid) {
             $redis = Redis::connection('default');
             $cacheName = 'api_live:' . $mid;
@@ -182,8 +183,10 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
 
             if (Streamer::where('mid', $mid)->where('status', 5)->first()) {
                 $liveStatus = 5;
+                $liveStr = '已实名';
             } elseif (Streamer::where('mid', $mid)->where('status', 1)->first()) {
                 $liveStatus = 1;
+                $liveStr = '已通过';
             } elseif (Streamer::where('mid', $mid)->first()) {
                 $liveStatus = 2;
             } else {
@@ -192,11 +195,23 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
         }
         $data['pageStatus'] = $pageStatus;
         $data['liveStatus'] = $liveStatus;
-        $data['roomPic'] = 'https://www.baidu.com/img/PCtm_d9c8750bed0b3c7d089fa7d55720d6cf.png';
-        $data['Rooms'] = LiveApply::from('live_apply as a')
+        $data['liveStr'] = $liveStr;
+        $data['roomPic'] = 'http://upload.binghuozhijia.com/uploads/5ef7f838611ae/5ef7f838611ac.jpg';
+        $Rooms = LiveApply::from('live_apply as a')
             ->Leftjoin('iceland.ice_member as m', 'm.id', '=', 'a.mid')
             ->select('a.name','a.stage','a.mid','a.streamer_id', 'a.coverImg', 'a.shareImg', 'a.startTime', 'a.endTime', 'm.nickname as anchor_name', 'm.headpic')
-            ->where('status', 1)->orderBy('stage', 'desc')->get();;
+            ->where('status', 1)->orderBy('stage', 'desc')->get();
+        $stagePicArr = [
+            '3' => ['pic' => 'http://upload.binghuozhijia.com/uploads/5ef7f017e96fd/5ef7f017e96fb.jpg', 'str' => '直播中'],
+            '2' => ['pic' => 'http://upload.binghuozhijia.com/uploads/5ef7eff15bbe8/5ef7eff15bbe5.jpg', 'str' => '即将开始'],
+            '1' => ['pic' => 'http://upload.binghuozhijia.com/uploads/5ef7efc82343c/5ef7efc82343a.jpg', 'str' => '已结束'],
+            '0' => ['pic' => '', 'str' => '未通过'],
+        ];
+        foreach ($Rooms as $room){
+            $room->stagePic = $stagePicArr[$room->stage]['pic'];
+            $room->stageStr = $stagePicArr[$room->stage]['str'];
+        }
+        $data['Rooms'] = $Rooms;
         return responseSuccess($data);
     }
 
