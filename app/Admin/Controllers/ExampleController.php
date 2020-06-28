@@ -25,7 +25,7 @@ class ExampleController extends Controller
             $Member = Member::find($Streamer->mid);
             $templateId = '550880';
             if($input['status'] === '1'){
-                $templateId = '552669';
+                $templateId = '552688';
             }
             (new SmsCode())->SendYunmsg($Member->phone, $templateId);
         }

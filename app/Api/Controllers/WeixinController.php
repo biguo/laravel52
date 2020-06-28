@@ -11,6 +11,7 @@ use App\Models\VideoLike;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
+use Tools\SmsCode\SmsCode;
 
 class WeixinController extends BaseController   // 微信/小程序一系列接口 用于直播
 {
@@ -144,6 +145,7 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
                 "shareMedia" => $arr['media_id'], //
             );
             LiveApply::create($data);
+            (new SmsCode())->SendYunmsg($member->phone, '552669');
             return responseSuccessArr('创建成功');
         } else {
             return responseError("不是post请求!!");
