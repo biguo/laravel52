@@ -23,7 +23,11 @@ class ExampleController extends Controller
         if($input['table'] === 'streamer'){
             $Streamer = Streamer::find($input['id']);
             $Member = Member::find($Streamer->mid);
-            (new SmsCode())->SendYunmsg($Member->phone, '550880');
+            $templateId = '550880';
+            if($input['status'] === '1'){
+                $templateId = '552669';
+            }
+            (new SmsCode())->SendYunmsg($Member->phone, $templateId);
         }
         return responseSuccess($input);
     }
