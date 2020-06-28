@@ -242,16 +242,18 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
 
         $LiveApply = LiveApply::where('id', $id)->first();
 
+        $select =  ['name', 'stage', 'coverImg', 'startTime', 'endTime', 'roomId'];
         if (time() > $LiveApply->endTime) {
             if (!$LiveApply->live_replay) {
                 $this->getReplay($LiveApply->roomId);
             }
+            $select = array_merge($select, ['live_replay', 'live_count']);
         } elseif ((time() < $LiveApply->endTime) && (time() > $LiveApply->startTime)) {
             $LiveApply->live_count += 1;
             $LiveApply->save();
         }
 
-        $Room = array_only($LiveApply->toarray(), ['name', 'stage', 'coverImg', 'startTime', 'endTime', 'roomId', 'live_replay', 'live_count']);
+        $Room = array_only($LiveApply->toarray(), $select);
         $Room['range'] = date("Y-m-d H:i:s", $LiveApply->startTime) . '至' . date("Y-m-d H:i:s", $LiveApply->endTime);
         $data['info'] = $Room;
 
