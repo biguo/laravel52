@@ -58,6 +58,7 @@ $api->version('v1', ['namespace' => 'App\Api\Controllers'], function ($api) {
     $api->any('wx/CreateLiveRoom','WeixinController@CreateLiveRoom'); //【创建直播间】接口
     $api->any('wx/getLiveInfo','WeixinController@getLiveInfo'); //【获取直播房间列表】接口
     $api->any('wx/getLiveRoom','WeixinController@getLiveRoom'); // 获取直播房间列表
+    $api->any('wx/LiveRoomDetail','WeixinController@LiveRoomDetail'); // 获取直播房间详情
     $api->any('wx/getReplay','WeixinController@getReplay'); //【获取回放源视频】接口
 
     $api->any('wx/UploadVideo','WeixinController@UploadVideo'); // 上传视频

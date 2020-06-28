@@ -58,8 +58,8 @@ class LiveApplyController extends Controller
 
                 $interface = 'https://api.weixin.qq.com/cgi-bin/media/get?access_token=';
                 $token = gettoken('wxdfe1d168b25d4fff',true);
-                $shareImg = "<img src='".$interface . $token . "&media_id=" . $LiveApply->shareImg."' style='max-width:100px;max-height:100px' class='img img-thumbnail' />";
-                $coverImg = "<img src='".$interface . $token . "&media_id=" . $LiveApply->coverImg."' style='max-width:100px;max-height:100px' class='img img-thumbnail' />";
+                $shareImg = "<img src='".$interface . $token . "&media_id=" . $LiveApply->coverMedia."' style='max-width:100px;max-height:100px' class='img img-thumbnail' />";
+                $coverImg = "<img src='".$interface . $token . "&media_id=" . $LiveApply->coverMedia."' style='max-width:100px;max-height:100px' class='img img-thumbnail' />";
 
                 $form->display('phone', '手机号')->default($Member->phone);
                 $form->display('nickname', '主播昵称')->default($Member->nickname);
@@ -204,9 +204,12 @@ class LiveApplyController extends Controller
             $Member = Member::find($LiveApply->mid);
 
             $data = $LiveApply->toArray();
-            $data = array_except($data,['created_at', 'updated_at', 'id', 'mid', 'refuse_reason', 'status', 'streamer_id']);
+            $data = array_only($data,['name', 'coverMedia', 'startTime', 'endTime', 'shareMedia', 'type', 'screenType', 'closeLike', 'closeGoods', 'closeComment']);
             $data = array_merge($data, ['anchorName' => $Member->nickname, 'anchorWechat' => $Streamer->wechat]);
-
+            $data['coverImg'] = $data['coverMedia'];
+            $data['shareImg'] = $data['shareMedia'];
+            unset($data['coverMedia']);
+            unset($data['shareMedia']);
             $interface = 'https://api.weixin.qq.com/wxaapi/broadcast/room/create';
             $token = gettoken('wxdfe1d168b25d4fff', true);
             $url = $interface . "?access_token=" . $token;
