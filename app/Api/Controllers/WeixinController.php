@@ -185,7 +185,7 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
             '104' => '1',
             '105' => '1',
             '106' => '1',
-            '107' => '1',
+            '107' => '1'
         ];
         $Rooms = LiveApply::from('live_apply as a')->where('status', 1)->orderBy('stage', 'desc')->get();
         $arr = $this->getLiveInfo();
@@ -196,6 +196,11 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
                     if($item->roomId === $v['roomid']){
                         $item->stage = $statusArr[$v['live_status']];
                         $item->save();
+                        if($v['live_status'] === 103){
+                            if ($item->live_replay === null) {
+                                $this->getReplay($item->roomId, $item);
+                            }
+                        }
                     }
                 }
             }
@@ -272,7 +277,7 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
         $select =  ['name', 'stage', 'coverImg', 'startTime', 'endTime', 'roomId'];
         if ($LiveApply->stage === 1) {
             if ($LiveApply->live_replay === null) {
-                $this->getReplay($LiveApply->roomId);
+                $this->getReplay($LiveApply->roomId, $LiveApply);
             }
             $select = array_merge($select, ['live_replay', 'live_count']);
         } elseif ($LiveApply->stage === 3) {
@@ -306,7 +311,7 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
     /**
      * 获取回放源视频
      */
-    public function getReplay($room_id)
+    public function getReplay($room_id, $LiveApply)
     {
         $data = array(
             "action" => 'get_replay',
@@ -321,8 +326,7 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
         $ret = doCurlPostRequest($url, $json_data);
 
         $arr = json_decode($ret, true);
-        if (($arr['errcode'] === 0) && (($arr['total'] >= 1))) {
-            $LiveApply = LiveApply::where('roomId', $room_id)->first();
+        if (($arr['errcode'] === 0) && ($arr['total'] >= 1) && ($arr['live_replay']) && ($arr['live_replay'][1])) {
             $LiveApply->live_replay = $arr['live_replay'][1]['media_url'];
             $LiveApply->save();
         }
