@@ -18,7 +18,7 @@ class Video extends Model
      */
     public function VideoPublishedList($mid = null)
     {
-        return $this->VideoList($mid);
+        return $this->VideoList($mid,100);
     }
 
 
@@ -33,7 +33,7 @@ class Video extends Model
     }
 
 
-    public function VideoList($mid = null, $paginate = 6, $order_type = 1, $source_id = null)
+    public function VideoList($mid = null, $paginate = 6, $order_type = 1, $source_id = null)  # $order_type 1 id 倒序 2 点赞数倒排
     {
         $query =  self::from('video as v')
             ->LeftJoin('iceland.ice_member as m', 'v.mid','=','m.id')
@@ -41,8 +41,8 @@ class Video extends Model
             ->select('v.id','v.title','v.tags',
                 DB::raw("CONCAT('".Upload_Domain."',v.url) as url"),
                 DB::raw("CONCAT('".Upload_Domain."',v.pic) as pic"),
-                DB::raw("IFNULL(m.nickname,'冰火乡村') as  nickname"),
-                DB::raw("IFNULL(m.headpic,'http://upload.binghuozhijia.com/uploads/5ee83b780a3fd/5ee83b780a3fb.jpg') as headpic"),
+                'm.nickname',
+                'm.headpic',
                 DB::raw("COUNT(l.id) as like_count"),
                 DB::raw('0 as height'))
             ->where([['v.status','=','1'],['v.project','=','乡村民宿']])

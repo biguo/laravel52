@@ -175,7 +175,8 @@ class VideoController extends Controller
                 $actions =Input::route()->getAction(); //获得当前action位置
                 if(isset($actions['controller']) && ($arr = explode('@', $actions['controller'])) && ($currentAction = $arr[1])){
                     if($currentAction === 'store'){ //新建
-                        $form->model()->update(['status' => Status_Review_video, 'project' => '乡村民宿', 'mid' => 0]);
+                        $midArr = [26103];
+                        $form->model()->update(['status' => Status_Review_video, 'project' => '乡村民宿', 'mid' => $midArr[mt_rand(0,count($midArr)-1)]]);
                     }
                 }
             });
