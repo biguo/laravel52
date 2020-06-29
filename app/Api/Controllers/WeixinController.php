@@ -145,7 +145,6 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
                 "shareMedia" => $arr['media_id'], //
             );
             LiveApply::create($data);
-            (new SmsCode())->SendYunmsg($member->phone, '552669');
             return responseSuccessArr('创建成功');
         } else {
             return responseError("不是post请求!!");
@@ -162,11 +161,12 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
             "limit" => 10
         );
         $interface = "http://api.weixin.qq.com/wxa/business/getliveinfo";
-        $token = gettoken('wxdfe1d168b25d4fff');
+        $token = gettoken('wxdfe1d168b25d4fff',true);
         $url = $interface . "?access_token=" . $token;
         $json_data = JSON($data);
         $ret = doCurlPostRequest($url, $json_data);
-        print_r($ret);
+        $arr = json_decode($ret, true);
+        return $arr;
     }
 
     /**
@@ -174,8 +174,32 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
      */
     private function checkStage()
     {
-        $sql = "update live_apply set stage=(IF((unix_timestamp() > endTime),1,IF((unix_timestamp() < startTime),2,3))) where status=1";
-        DB::update($sql);
+//        $sql = "update live_apply set stage=(IF((unix_timestamp() > endTime),1,IF((unix_timestamp() < startTime),2,3))) where status=1";
+//        DB::update($sql);
+//        101：直播中，102：未开始，103已结束，104禁播，105：暂停，106：异常，107：已过期
+//        0 未直播 1 已结束 2 未开始  3 已开始
+        $statusArr = [
+            '101' => '3',
+            '102' => '2',
+            '103' => '1',
+            '104' => '1',
+            '105' => '1',
+            '106' => '1',
+            '107' => '1',
+        ];
+        $Rooms = LiveApply::from('live_apply as a')->where('status', 1)->orderBy('stage', 'desc')->get();
+        $arr = $this->getLiveInfo();
+        if (($arr['errcode'] === 0) && (($arr['total'] >= 1))) {
+            $room_info = $arr['room_info'];
+            foreach ($Rooms as $item){
+                foreach ($room_info as $v){
+                    if($item->roomId === $v['roomid']){
+                        $item->stage = $statusArr[$v['live_status']];
+                        $item->save();
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -215,7 +239,7 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
         $data['roomPic'] = 'http://upload.binghuozhijia.com/uploads/5ef7f838611ae/5ef7f838611ac.jpg';
         $Rooms = LiveApply::from('live_apply as a')
             ->Leftjoin('iceland.ice_member as m', 'm.id', '=', 'a.mid')
-            ->select('a.id','a.name', 'a.stage', 'a.status', 'a.mid', 'a.streamer_id', 'a.coverImg', 'a.shareImg', 'a.startTime', 'a.endTime', 'm.nickname as anchor_name', 'm.headpic')
+            ->select('a.id','a.roomId','a.name', 'a.stage', 'a.status', 'a.mid', 'a.streamer_id', 'a.coverImg', 'a.shareImg', 'a.startTime', 'a.endTime', 'm.nickname as anchor_name', 'm.headpic')
             ->where('status', 1)->orderBy('stage', 'desc')->get();
         $stagePicArr = [
             '3' => ['pic' => 'http://upload.binghuozhijia.com/uploads/5ef7f017e96fd/5ef7f017e96fb.jpg', 'str' => '直播中'],
@@ -232,6 +256,7 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
             $room->stagePic = $stagePicArr[$room->stage]['pic'];
             $room->stageStr = $stagePicArr[$room->stage]['str'];
             $room->statusStr = $statusArr[$room->status];
+            $room->ImUpload = ($room->mid === $mid);
         }
         $data['Rooms'] = $Rooms;
         return responseSuccess($data);

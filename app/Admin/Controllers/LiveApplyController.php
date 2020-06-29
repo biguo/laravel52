@@ -17,6 +17,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\Input;
+use Tools\SmsCode\SmsCode;
 
 
 class LiveApplyController extends Controller
@@ -220,6 +221,7 @@ class LiveApplyController extends Controller
                 $LiveApply->status = 1;
                 $LiveApply->roomId = $ret['roomId'];
                 $LiveApply->save();
+                (new SmsCode())->SendYunmsg($Member->phone, '552797');
                 return responseSuccess($ret);
             }else{
                 return responseError($ret['errmsg']);
