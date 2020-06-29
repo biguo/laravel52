@@ -323,7 +323,7 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
         $arr = json_decode($ret, true);
         if (($arr['errcode'] === 0) && (($arr['total'] >= 1))) {
             $LiveApply = LiveApply::where('roomId', $room_id)->first();
-            $LiveApply->live_replay = $arr['live_replay'][0]['media_url'];
+            $LiveApply->live_replay = $arr['live_replay'][1]['media_url'];
             $LiveApply->save();
         }
     }
