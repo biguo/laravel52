@@ -18,7 +18,7 @@ class Video extends Model
      */
     public function VideoPublishedList($mid = null)
     {
-        return $this->VideoList($mid,100);
+        return $this->VideoList($mid);
     }
 
 
