@@ -412,16 +412,27 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
                 return responseError('请登录');
             }
             $all = $request->all();
+
+            $img = file_get_contents('http://upload.binghuozhijia.com/'. $all['pic']);
+            $new_path = base_path('public') . DIRECTORY_SEPARATOR . 'upload' . DIRECTORY_SEPARATOR . 'image' . DIRECTORY_SEPARATOR . microtime(true) * 10000 . '.png';
+            @file_put_contents($new_path, $img);
+            $arr0 = $this->checkMedia($new_path);
+            unlink($new_path);
+            if($arr0['errcode'] !== 0){
+                return responseError("没有通过图片检验!!");
+            }
+
+            $arr1 = $this->checkContent($all['title']);
+            if($arr1['errcode'] !== 0){
+                return responseError("没有通过文字检验!!");
+            }
             if (isset($all['tags'])) {
                 $tagArr = json_decode($all['tags'], true);
                 $all['tags'] = implode(',', $tagArr);
             }
             $all['mid'] = $mid;
             $all['project'] = '乡村民宿';
-            $res = Video::create($all);
-            $like['source_id'] = $res->id;
-            $like['mid'] = $mid;
-            VideoLike::create($like);
+            Video::create($all);
             return responseSuccessArr('创建成功');
         } else {
             return responseError("不是post请求!!");
