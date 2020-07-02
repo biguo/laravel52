@@ -116,7 +116,7 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
                 return responseError('无此主播或主播申请还未通过');
             }
 
-            if (!isset($params['title']) || strlen($params['title']) < 6) {
+            if (!isset($params['title']) || strlen($params['title']) < 6 || strlen($params['title']) >34) {
                 return responseError('请提供合适长度(6-34字节)的房间名称');
             }
             $startTime = strtotime($params['Date'] . '' . $params['startTime']);

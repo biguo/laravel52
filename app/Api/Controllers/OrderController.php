@@ -32,8 +32,11 @@ class OrderController extends BaseController
         if (!isset($inputs['product_id'])) {
             return responseError('请输入产品id');
         }
-        if(((int)$inputs['product_id'] === 23) && (time() < 1588120200)){  # 1元券 4.29 08:30之后才放开购买
-            return responseError('4月29日早上8点半1元活动正式上线，敬请期待！');
+        if((int)$inputs['product_id'] === 23){
+            $count = Order::where([['mid','=',$mid]])->whereIn('status', [2, 6])->count();
+            if($count > 0){
+                return responseError('您已经购买过1元产品了');
+            }
         }
         $member = Member::getMemberById($mid);
         $member->orders()->where('status', Status_UnPay)->delete();
