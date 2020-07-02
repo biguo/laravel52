@@ -10,6 +10,7 @@ use App\Models\Video;
 use App\Models\VideoLike;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redis;
 use Tools\SmsCode\SmsCode;
 
@@ -82,6 +83,46 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
     }
 
     /**
+     * 图片安全内容检测接口
+     */
+    public function checkMedia($new_path)
+    {
+        $args['media'] = new \CurlFile($new_path);
+        $token = gettoken('wxdfe1d168b25d4fff', true);
+        $url = "https://api.weixin.qq.com/wxa/img_sec_check?access_token=" . $token ;
+        $curl = curl_init();//初始化
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_HEADER, 0);
+        curl_setopt($curl, CURLOPT_POST, 1);
+        curl_setopt($curl, CURLOPT_BINARYTRANSFER, true);
+        curl_setopt($curl, CURLOPT_TIMEOUT, 100);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $args);
+        $output = curl_exec($curl);
+        curl_close($curl);
+        $arr = json_decode($output, true);
+        return $arr;
+    }
+
+    /**
+     * 文字安全内容检测接口
+     */
+    public function checkContent($content)
+    {
+        $data = array(
+            "content" => $content
+        );
+        $interface = "https://api.weixin.qq.com/wxa/msg_sec_check";
+        $token = gettoken('wxdfe1d168b25d4fff',true);
+        $url = $interface . "?access_token=" . $token;
+        $json_data = JSON($data);
+        $ret = doCurlPostRequest($url, $json_data);
+        $arr = json_decode($ret, true);
+        return $arr;
+    }
+
+
+    /**
      *  创建直播室
      *
      * {
@@ -125,6 +166,17 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
                 return responseError('开始时间须小于结束时间');
             }
             $newPath = $this->putMedia($params['coverImg']);
+
+            $arr0 = $this->checkMedia($newPath);
+            if($arr0['errcode'] !== 0){
+                return responseError("没有通过图片检验!!");
+            }
+
+            $arr1 = $this->checkContent($params['title']);
+            if($arr1['errcode'] !== 0){
+                return responseError("没有通过文字检验!!");
+            }
+
             $coverImg = (new FileModel())->uploads($newPath, uniqid() . '.jpg');
             $res = $this->getMediaId($newPath);
             $arr = json_decode($res, true);
