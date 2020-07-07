@@ -169,6 +169,7 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
 
             $arr0 = $this->checkMedia($newPath);
             if($arr0['errcode'] !== 0){
+                unlink($newPath);
                 return responseError("没有通过图片检验!!");
             }
 
@@ -212,7 +213,7 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
             "start" => 0,
             "limit" => 10
         );
-        $interface = "http://api.weixin.qq.com/wxa/business/getliveinfo";
+        $interface = "https://api.weixin.qq.com/wxa/business/getliveinfo";
         $token = gettoken('wxdfe1d168b25d4fff',true);
         $url = $interface . "?access_token=" . $token;
         $json_data = JSON($data);

@@ -124,10 +124,12 @@ class LiveApplyController extends Controller
             $grid->column('name', '房间名字');
             $grid->column('nickname', '主播昵称');
             $grid->column('wechat', '主播微信号')->display(function (){
-                return Streamer::find($this->streamer_id)->value('wechat');
+                $Streamer =  Streamer::find($this->streamer_id);
+                return $Streamer->wechat;
             });
             $grid->column('sstatus', '主播状态')->display(function () {
-                $sstatus = Streamer::find($this->streamer_id)->value('status');
+                $Streamer =  Streamer::find($this->streamer_id);
+                $sstatus = $Streamer->status;
                 $baseStatus = [
                     '1' => '上线中(未实名)',
                     '2' => '提交审核中',
