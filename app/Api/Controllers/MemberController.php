@@ -57,8 +57,21 @@ class MemberController extends BaseController
             $array['doingOrders'] = $member->orders()->where('status', Status_Payed)->count();
             $saved = Order::where('mid', $mid)->whereIn('status', [Status_Payed, Status_OrderUsed])->sum('saved');
             $array['saved'] = ($saved === null) ? 0 :$saved ;
-            $array['card'] = Card::where('mid', $mid)->select('info', 'description')->get();
+//            $array['card'] = Card::where('mid', $mid)->select('info', 'description')->get();
             return responseSuccess($array);
+        }
+        return responseError('非法请求');
+    }
+
+    public function currentOrder(Request $request)
+    {
+        if ($request->isMethod('GET')) {
+            $mid = $this->checkLogin($request);
+            if (!$mid) {
+                return responseError('请登录');
+            }
+            $orders = Order::where([['mid','=', $mid], ['status','=', Status_Payed]])->get();
+            return responseSuccess($orders);
         }
         return responseError('非法请求');
     }

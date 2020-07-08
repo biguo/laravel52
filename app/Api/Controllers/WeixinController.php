@@ -38,7 +38,7 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
             if ($streamer) {
                 return responseError("您已经通过了");
             }
-            if (!$request->get('nickname') || strlen($request->get('nickname')) < 4) {
+            if (!$request->get('nickname') || strlen($request->get('nickname')) < 4 || strlen($request->get('nickname')) > 30) {
                 return responseError('请提供合适长度(4-30字节)的昵称');
             }
             $names = ['realname', 'nickname'];
@@ -205,7 +205,7 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
     }
 
     /**
-     *  获取直播房间列表  作废
+     *  获取直播房间列表
      */
     public function getLiveInfo()
     {
@@ -320,6 +320,11 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
         return responseSuccess($data);
     }
 
+    /**
+     * 直播室详细页
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function LiveRoomDetail(Request $request)
     {
         $id = $request->get('id');

@@ -27,21 +27,23 @@ class OrderController extends BaseController
         if (!$mid) {
             return responseError('请登录');
         }
+
         // 接受全部的参数
         $inputs = $request->all();
         if (!isset($inputs['product_id'])) {
             return responseError('请输入产品id');
         }
-        if((int)$inputs['product_id'] === 23){
-            $count = Order::where([['mid','=',$mid]])->whereIn('status', [2, 6])->count();
+        if((int)$inputs['product_id'] === 23){  #1元产品
+            $count = Order::where([['mid','=',$mid]])->whereIn('status', [Status_Payed, Status_OrderUsed])->count();
             if($count > 0){
                 return responseError('您已经购买过1元产品了');
             }
         }
-        $member = Member::getMemberById($mid);
-        $member->orders()->where('status', Status_UnPay)->delete();
-        if (count($member->doingOrders()) > 0) {
-            return responseError('您有未支付的订单或者您的套餐未使用完');
+        Order::where([['mid','=', $mid], ['status','=',Status_UnPay]])->delete();
+
+        $hasPayed = Order::where([['mid','=', $mid], ['product_id','=',$inputs['product_id']], ['status','=',Status_Payed]])->get();
+        if (count($hasPayed) > 0) {
+            return responseError('这个产品的您有套餐未使用');
         }
         $inputs['mid'] = $mid;
         return (new Order())->AddOrder($inputs);

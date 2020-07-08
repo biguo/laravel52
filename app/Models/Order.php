@@ -143,7 +143,7 @@ class Order extends Model
             $array = array_only(array_merge($order->toarray(), object_array($object)), ['trade_no', 'title', 'mid', 'total_fee', 'country_id']);
             $array['total_fee'] = round($array['total_fee']/100,2);
             $record = AccountRecord::create($array);
-            $this->prepareCard($order);
+//            $this->prepareCard($order);
             if ($save && $record) {
                 DB::commit();
                 return responseSuccess("支付成功");
@@ -157,6 +157,11 @@ class Order extends Model
 
     }
 
+
+    /**
+     * card表已荒废  接口荒废
+     * @param $order
+     */
     public function prepareCard($order)
     {
         Card::where('mid', $order->mid)->delete();
