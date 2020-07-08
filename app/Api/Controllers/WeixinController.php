@@ -354,7 +354,7 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
         $Streamer = Streamer::from('streamer as s')
             ->Leftjoin('iceland.ice_member as m', 'm.id', '=', 's.mid')
             ->select('m.nickname', 's.introduce')
-            ->where('s.mid', $mid)
+            ->where('s.id', $LiveApply->streamer_id)
             ->first();
         $data['uploader'] = $Streamer;
 
