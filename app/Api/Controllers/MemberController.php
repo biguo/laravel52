@@ -88,14 +88,14 @@ class MemberController extends BaseController
             if (!$mid) {
                 return responseError('请登录');
             }
-            $order = Order::where('mid',$mid)->orderBy('created_at','desc')->first();
-            if($order){
-                $array['trade_no'] = $order->trade_no;
-                $array['status'] = ($order->status === 2)? 0:1;
-                $array['image'] = Upload_Domain.$order->image ;
+            $where = [['mid','=',$mid]];
+            if($id = $request->get('id')){
+                array_push($where, ['id','=', $id]);
             }
-            $array['card'] = Card::where('mid', $mid)->select('info', 'description')->get();
-            return responseSuccess($array);
+            $order = Order::where($where)->orderBy('created_at','desc')
+                ->select('trade_no', DB::raw("if(status=2,'0','1') as status"), DB::raw('concat("'.Upload_Domain.'",image) as image'))
+                ->get();
+            return responseSuccess($order);
         }
         return responseError('非法请求');
     }
