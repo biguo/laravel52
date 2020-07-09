@@ -70,7 +70,7 @@ class MemberController extends BaseController
             if (!$mid) {
                 return responseError('请登录');
             }
-            $orders = Order::where([['mid','=', $mid], ['status','=', Status_Payed]])->get();
+            $orders = Order::where([['mid','=', $mid], ['status','=', Status_Payed]])->select('id', DB::raw('concat("'.Upload_Domain.'",unuse_image) as unuse_image'))->get();
             return responseSuccess($orders);
         }
         return responseError('非法请求');
