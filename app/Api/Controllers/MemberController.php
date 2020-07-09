@@ -93,10 +93,19 @@ class MemberController extends BaseController
             if($id = $request->get('id')){
                 array_push($where, ['id','=', $id]);
             }
+            $array = [
+              '23' => 'http://upload.binghuozhijia.com/uploads/5eb4f17dea871/5eb4f17dea489.jpg',
+              '22' => 'http://upload.binghuozhijia.com/uploads/5ec78496817ac/5ec784968175b.jpg',
+              '26' => 'http://upload.binghuozhijia.com/uploads/5ec7849d2c765/5ec7849d2c71a.jpg',
+            ];
+
             $orders = Order::where($where)->orderBy('created_at','desc')->select('trade_no', DB::raw("if(status=2,'0','1') as status"), DB::raw('concat("'.Upload_Domain.'",image) as image'), 'product_id')->get();
             foreach ($orders as $order){
                 $item = Item::from('item as i')->leftJoin('product_item as pi','pi.item_id','=','i.id')->where('pi.product_id', $order->product_id)->select('title as info', 'description')->get()->toarray();
                 $order->item = $item;
+                if(isset($array[$order->product_id])){
+                    $order->pic = $array[$order->product_id];
+                }
             }
             return responseSuccess($orders);
         }
