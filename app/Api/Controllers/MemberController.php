@@ -6,6 +6,7 @@ use App\Models\AccountRecord;
 use App\Models\Card;
 use App\Models\Country;
 use App\Models\InviteCode;
+use App\Models\Item;
 use App\Models\Member;
 use App\Models\MemberOauth;
 use App\Models\Order;
@@ -92,10 +93,12 @@ class MemberController extends BaseController
             if($id = $request->get('id')){
                 array_push($where, ['id','=', $id]);
             }
-            $order = Order::where($where)->orderBy('created_at','desc')
-                ->select('trade_no', DB::raw("if(status=2,'0','1') as status"), DB::raw('concat("'.Upload_Domain.'",image) as image'))
-                ->get();
-            return responseSuccess($order);
+            $orders = Order::where($where)->orderBy('created_at','desc')->select('trade_no', DB::raw("if(status=2,'0','1') as status"), DB::raw('concat("'.Upload_Domain.'",image) as image'), 'product_id')->get();
+            foreach ($orders as $order){
+                $item = Item::from('item as i')->leftJoin('product_item as pi','pi.item_id','=','i.id')->where('pi.product_id', $order->product_id)->select('title as info', 'description')->get()->toarray();
+                $order->item = $item;
+            }
+            return responseSuccess($orders);
         }
         return responseError('非法请求');
     }
