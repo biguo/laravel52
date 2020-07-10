@@ -46,6 +46,9 @@ $api->version('v1', ['namespace' => 'App\Api\Controllers'], function ($api) {
     $api->any('product/orderShowBefore', 'ProductController@orderShowBefore');  //下单前页面
     $api->any('product/getList', 'ProductController@getList');  //会员卡列表
 
+    $api->any('CoPartner/addOrder', 'CopartnerApplyController@apply');  //下单
+    $api->any('CoPartner/orderWxpaynotify', 'CopartnerApplyController@orderWxpaynotify');//订单回调地址
+
     $api->post('order/addOrder', 'OrderController@addOrder');  //下单
     $api->post('order/doPay', 'OrderController@doPay');  //付款
     $api->any('order/orderWxpaynotify', 'OrderController@orderWxpaynotify');//订单回调地址
