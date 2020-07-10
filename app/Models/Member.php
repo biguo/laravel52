@@ -14,7 +14,7 @@ class Member extends Authenticatable implements JWTSubject
     protected $connection = 'original';
     protected $primaryKey = 'id'; //指定id
     public $timestamps = false;
-    protected $fillable = ['nickname', 'realname'];
+    protected $fillable = ['nickname', 'realname', 'benefit', 'type'];
 
     public function orders()
     {

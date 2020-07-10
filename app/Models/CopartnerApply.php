@@ -14,7 +14,10 @@ class CopartnerApply extends Model
     protected $guarded = [];
     public $timestamps = false;
 
-
+    public function member()
+    {
+        return $this->belongsTo(Member::class, 'mid');
+    }
     /**
      * 根据tradeNo 获得订单   第二个参数表示状态条件 默认只获得未支付的, 0表示所有
      * @param null $trade_no
@@ -100,7 +103,7 @@ class CopartnerApply extends Model
             $order->responsestr = json_encode($object);
             $order->paytime = $object->time_end;
             $save = $order->save();
-
+            $order->member->update(['type' => 3, 'benefit' => 10000]);
             if ($save) {
                 DB::commit();
                 return responseSuccess("支付成功");
