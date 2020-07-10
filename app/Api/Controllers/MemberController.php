@@ -4,6 +4,7 @@ namespace App\Api\Controllers;
 
 use App\Models\AccountRecord;
 use App\Models\Card;
+use App\Models\CopartnerApply;
 use App\Models\Country;
 use App\Models\InviteCode;
 use App\Models\Item;
@@ -37,7 +38,8 @@ class MemberController extends BaseController
                 $array = array_only($member->toarray(), ['id', 'phone', 'headpic', 'nickname', 'description', 'point']);
 
             $member->orders()->where('status', Status_UnPay)->delete();
-            $array['current_image'] = wanted;
+            $cop = CopartnerApply::where([['mid','=', $mid],['status','=', Status_Payed]])->first();
+            $array['current_image'] = $cop?  wanted : finding;
             $array['doingOrders'] = $member->orders()->where('status', Status_Payed)->count();
             $saved = Order::where('mid', $mid)->whereIn('status', [Status_Payed, Status_OrderUsed])->sum('saved');
             $array['saved'] = ($saved === null) ? 0 :$saved ;
