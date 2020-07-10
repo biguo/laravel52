@@ -37,24 +37,7 @@ class MemberController extends BaseController
                 $array = array_only($member->toarray(), ['id', 'phone', 'headpic', 'nickname', 'description', 'point']);
 
             $member->orders()->where('status', Status_UnPay)->delete();
-            $order = Order::where('mid',$mid)->orderBy('created_at','desc')->first();
-            if($order){
-                $array['trade_no'] = $order->trade_no;
-                $array['image'] = Upload_Domain.$order->image ;
-                $array['title'] = $order->title;
-                $array['product_id'] = $order->product_id;
-                if($order->status === 2){
-                    $array['status'] = 0;
-                    $array['current_image'] = Upload_Domain.$order->unuse_image;
-                }else{
-                    $array['status'] = 1;
-                    $array['current_image'] = Upload_Domain.$order->used_image;
-                }
-            }else{
-                $array['title'] = '';
-                $array['trade_no'] = '';
-                $array['current_image'] = wanted;
-            }
+            $array['current_image'] = wanted;
             $array['doingOrders'] = $member->orders()->where('status', Status_Payed)->count();
             $saved = Order::where('mid', $mid)->whereIn('status', [Status_Payed, Status_OrderUsed])->sum('saved');
             $array['saved'] = ($saved === null) ? 0 :$saved ;
