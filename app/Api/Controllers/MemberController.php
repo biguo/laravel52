@@ -40,10 +40,19 @@ class MemberController extends BaseController
             $member->orders()->where('status', Status_UnPay)->delete();
             $cop = CopartnerApply::where([['mid','=', $mid],['status','=', Status_Payed]])->first();
             $array['current_image'] = $cop?  wanted : finding;
-            $array['doingOrders'] = $member->orders()->where('status', Status_Payed)->count();
+
+            $count = DB::table('order')->where('mid',$mid)
+                ->where(function ($query) {
+                    $query->where(function ($query) {
+                        $query->where('product_id', '=', '23')->whereIn('status', ['2', '6']);
+                    })
+                    ->orWhere([['product_id','=', '22'], ['status','=','2']])
+                    ->orWhere([['product_id','=', '26'], ['status','=','2']]);
+                })->count();
+
+            $array['doingOrders'] = ($count >= 3)? 0 : 1;
             $saved = Order::where('mid', $mid)->whereIn('status', [Status_Payed, Status_OrderUsed])->sum('saved');
             $array['saved'] = ($saved === null) ? 0 :$saved ;
-//            $array['card'] = Card::where('mid', $mid)->select('info', 'description')->get();
             return responseSuccess($array);
         }
         return responseError('非法请求');
