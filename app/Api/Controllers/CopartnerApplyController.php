@@ -38,7 +38,7 @@ class CopartnerApplyController extends BaseController
             }
             return CopartnerApply::doPay($mid, $partner->trade_no); // 支付成功
         } else {
-            $partner = CopartnerApply::where([['mid','=',$mid], ['status','=',Status_UnPay]])->orderBy('id','desc')->select('phone')->first();
+            $partner = CopartnerApply::where([['mid','=',$mid], ['status','=',Status_UnPay]])->orderBy('id','desc')->select('phone', 'id', 'trade_no')->first();
             return responseSuccess($partner);
         }
     }
