@@ -103,7 +103,13 @@ class CopartnerApply extends Model
             $order->responsestr = json_encode($object);
             $order->paytime = $object->time_end;
             $save = $order->save();
-            $order->member->update(['type' => 3, 'benefit' => 10000]);
+            $member = Member::getMemberByPhone($order->phone);
+            if(!$member){
+                Member::addNewMember(['phone' => $order->phone]);
+                $member = Member::getMemberByPhone($order->phone);
+            }
+            $member->update(['type' => 3]);
+            $member->increment('benefit', 10000);
             if ($save) {
                 DB::commit();
                 return responseSuccess("支付成功");
@@ -116,4 +122,6 @@ class CopartnerApply extends Model
         return responseError('订单不对,数据库无数据');
 
     }
+
+
 }
