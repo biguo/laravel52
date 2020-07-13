@@ -25,5 +25,6 @@ Route::group([
     $router->any('streamerPass', 'LiveApplyController@pass'); //主播实名
     $router->any('toLive', 'LiveApplyController@toLive'); //直播房间开通
     $router->resource('LiveApply', LiveApplyController::class);
+    $router->resource('Copartner', CopartnerApplyController::class);
     $router->any('changeStatus', 'ExampleController@changeStatus');
 });

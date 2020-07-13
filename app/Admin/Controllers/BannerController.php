@@ -82,6 +82,7 @@ class BannerController extends Controller
         return Admin::grid(Banner::class, function (Grid $grid) {
             $grid->model()->where('country_id',$this->country)->orderBy('status', 'desc')->orderBy('sort')->orderBy('id', 'desc');
             $grid->disableExport();
+            $grid->disableRowSelector();
             $grid->id('ID')->sortable();
             $grid->title()->editable();
             $grid->subtitle()->editable();
