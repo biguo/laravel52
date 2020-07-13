@@ -21,16 +21,20 @@ class CopartnerApplyController extends BaseController
         }
         if ($request->isMethod('POST')) {
             $all = $request->all();
-            $attr = array_except($all, ['trade_no', 'id']);
+            $where  = array_only($all, ['trade_no', 'id']);
+            $attr = array_except($all, ['trade_no', 'id', 'piece']);
             $attr['mid'] = $mid;
+
+            $basePrice = 1;
+            $attr['price'] = $request->get('piece') * $basePrice;
+
             if(isset($all['trade_no']) && isset($all['id'])){
-                $partner = CopartnerApply::where($all)->first();
+                $partner = CopartnerApply::where($where)->first();
                 if($partner){
                     $partner->update($attr);
                     return CopartnerApply::doPay($mid, $partner->trade_no); // 支付成功
                 }
             }
-            $attr['price'] = 1;
             $attr['trade_no'] = 'CoP' . StrOrderOne();
             $partner = CopartnerApply::create($attr);
             if (!$partner) {

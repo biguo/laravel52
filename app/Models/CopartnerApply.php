@@ -60,7 +60,7 @@ class CopartnerApply extends Model
             $openid = $redisOpenid ? $redisOpenid : $memberOauth->openid2;
 
             $weChatPay = new Wechatpay();
-            $prepay_ver = $weChatPay->getXcxPrePayOrder($appId, '合伙人申请', $Order->trade_no, $Order->price * 100, $openid, 'public/api/CoPartner/orderWxpaynotify');
+            $prepay_ver = $weChatPay->getXcxPrePayOrder($appId, '合伙人申请', $Order->trade_no.'_'.time(), $Order->price * 100, $openid, 'public/api/CoPartner/orderWxpaynotify');
 
             if (empty($prepay_ver) || !is_array($prepay_ver)) {
                 return responseError('获取预支付订单失败');
@@ -84,7 +84,7 @@ class CopartnerApply extends Model
      *    "mch_id":"1487769092",
      *    "nonce_str":"iZhh3vtKc1KXIAWkmi8n6zVq4M3Ehri9",
      *    "openid":"ocaf_0YXGW2U1wdVWo2LQCGyOkow",
-     *    "out_trade_no":"HOME2018032131226",
+     *    "out_trade_no":"CoP2020071303026_1594627514",
      *    "result_code":"SUCCESS",
      *    "return_code":"SUCCESS",
      *    "sign":"F2DAE8D01E727D8F7BC263B89C9A8906",
@@ -95,7 +95,9 @@ class CopartnerApply extends Model
      */
     public function orderWxpaynotify($object)
     {
-        $order = self::getOrderByTradeNo($object->out_trade_no);  //调试完  把第二个参数去掉
+        $tradeNoArr= explode('_',$object->out_trade_no);
+        $out_trade_no = $tradeNoArr[0];
+        $order = self::getOrderByTradeNo($out_trade_no);  //调试完  把第二个参数去掉
         if ($order) {
             DB::beginTransaction();
             $order->status = Status_Payed;
