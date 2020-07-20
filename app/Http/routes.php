@@ -40,6 +40,7 @@ $api->version('v1', ['namespace' => 'App\Api\Controllers'], function ($api) {
     $api->any('common/shareXcx', 'CommonController@shareXcx');  // 分享二维码
     $api->any('common/img', 'CommonController@uploadImg');  //上传图片(七牛
     $api->any('common/testSMS', 'CommonController@testSMS');  //测试短信
+    $api->post('common/Refund', 'CommonController@Refund');  //退款
 
     $api->any('banner/list', 'BannerController@getList');  //轮播图
 
@@ -48,6 +49,7 @@ $api->version('v1', ['namespace' => 'App\Api\Controllers'], function ($api) {
 
     $api->any('CoPartner/addOrder', 'CopartnerApplyController@apply');  //下单
     $api->any('CoPartner/orderWxpaynotify', 'CopartnerApplyController@orderWxpaynotify');//订单回调地址
+    $api->any('CoPartner/rebate', 'CopartnerApplyController@rebate');// 返利列表
 
     $api->post('order/addOrder', 'OrderController@addOrder');  //下单
     $api->post('order/doPay', 'OrderController@doPay');  //付款

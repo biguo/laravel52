@@ -3,6 +3,8 @@
 namespace App\Api\Controllers;
 
 use App\Models\CopartnerApply;
+use App\Models\CopartnerRebate;
+use App\Models\Member;
 use Illuminate\Http\Request;
 
 class CopartnerApplyController extends BaseController
@@ -81,4 +83,22 @@ class CopartnerApplyController extends BaseController
         return (new CopartnerApply())->orderWxpaynotify($response);
     }
 
+    /**
+     * 合伙人返利收益
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function rebate(Request $request)
+    {
+        $mid = $this->checkLogin($request);
+        if (!$mid) {
+            return responseError('请登录');
+        }
+        if ($request->isMethod('POST')) {
+            $data['res'] = CopartnerRebate::dataList($mid);
+            $data['count'] = Member::where('pid' , $mid)->count();
+            $data['totalamount'] = Member::where('id' , $mid)->first()->totalamount;
+            return responseSuccess($data);
+        }
+    }
 }
