@@ -50,9 +50,10 @@ class MemberController extends BaseController
                     ->orWhere([['product_id','=', '26'], ['status','=','2']]);
                 })->count();
 
-            $array['doingOrders'] = ($count >= 3)? 0 : 1;
+            $array['doingOrders'] = ($count >= 3)? 0 : 1;  # 还能不能再购入产品了
             $saved = Order::where('mid', $mid)->whereIn('status', [Status_Payed, Status_OrderUsed])->sum('saved');
             $array['saved'] = ($saved === null) ? 0 :$saved ;
+            $array['history_number'] = AccountRecord::where('mid', $mid)->where('change', Change_Recharge)->count();
             return responseSuccess($array);
         }
         return responseError('非法请求');
