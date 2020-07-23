@@ -35,7 +35,7 @@ class MemberOauth extends Model
 
     public static function getMemberOauthByMid($mid)
     {
-        return self::where('mid', $mid)->first();
+        return self::where('mid', $mid)->where('project', '乡村民宿')->first();
     }
 
 }

@@ -38,7 +38,7 @@ class MemberController extends BaseController
                 $array = array_only($member->toarray(), ['id', 'phone', 'headpic', 'nickname', 'description', 'point']);
 
             $member->orders()->where('status', Status_UnPay)->delete();
-            $cop = CopartnerApply::where([['mid','=', $mid],['status','=', Status_Payed]])->first();
+            $cop = CopartnerApply::where([['phone','=', $member->phone],['status','=', Status_Payed]])->first();
             $array['current_image'] = $cop?  wanted : finding;
 
             $count = DB::table('order')->where('mid',$mid)
@@ -51,6 +51,7 @@ class MemberController extends BaseController
                 })->count();
 
             $array['doingOrders'] = ($count >= 3)? 0 : 1;  # 还能不能再购入产品了
+            $array['payed'] = $member->orders->where('status', Status_Payed)->count();
             $saved = Order::where('mid', $mid)->whereIn('status', [Status_Payed, Status_OrderUsed])->sum('saved');
             $array['saved'] = ($saved === null) ? 0 :$saved ;
             $array['history_number'] = AccountRecord::where('mid', $mid)->where('change', Change_Recharge)->count();

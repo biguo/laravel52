@@ -84,7 +84,7 @@ class CopartnerApply extends Model
      *    "mch_id":"1487769092",
      *    "nonce_str":"iZhh3vtKc1KXIAWkmi8n6zVq4M3Ehri9",
      *    "openid":"ocaf_0YXGW2U1wdVWo2LQCGyOkow",
-     *    "out_trade_no":"CoP2020071303026_1594627514",
+     *    "out_trade_no":"CoP2020072365025_1595468376",
      *    "result_code":"SUCCESS",
      *    "return_code":"SUCCESS",
      *    "sign":"F2DAE8D01E727D8F7BC263B89C9A8906",
@@ -112,7 +112,16 @@ class CopartnerApply extends Model
             }
             $member->update(['type' => 3]);
             $member->increment('benefit', 10000);
-            if ($save) {
+
+            $array['trade_no'] = $out_trade_no;
+            $array['total_fee'] = round($object->total_fee/100,2);
+            $array['title'] = '民宿合伙人套餐('.$array['total_fee'].')';
+            $array['mid'] = $member->id;
+            $array['country_id'] = 1;
+
+            $ac = AccountRecord::create($array);
+
+            if ($save && $ac) {
                 DB::commit();
                 return responseSuccess("支付成功");
             } else {
