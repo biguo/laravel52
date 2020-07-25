@@ -34,7 +34,7 @@ class OrderController extends BaseController
             return responseError('请输入产品id');
         }
         if((int)$inputs['product_id'] === 23){  #1元产品
-            $count = Order::where([['mid','=',$mid]])->whereIn('status', [Status_Payed, Status_OrderUsed])->count();
+            $count = Order::where([['mid','=',$mid], ['product_id','=',23]])->whereIn('status', [Status_Payed, Status_OrderUsed])->count();
             if($count > 0){
                 return responseError('您已经购买过1元产品了');
             }
