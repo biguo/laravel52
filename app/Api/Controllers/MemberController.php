@@ -60,6 +60,33 @@ class MemberController extends BaseController
         return responseError('非法请求');
     }
 
+    /**
+     * 合伙人基础信息
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function copartnerInfo(Request $request)
+    {
+        if ($request->isMethod('GET')) {
+            $mid = $this->checkLogin($request);
+            if (!$mid) {
+                return responseError('请登录');
+            }
+            $user = Member::where('id',$mid)->select('totalamount', 'benefit', 'phone')->first();
+            if(!$user)
+                return responseError('找不到对象');
+            $user = $user->toarray();
+            $user['sums'] = CopartnerApply::where([['phone','=', $user['phone']], ['status','=', Status_Payed]])->sum('price');
+            return responseSuccess($user);
+        }
+        return responseError('非法请求');
+    }
+
+    /**
+     * 当前订单
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function currentOrder(Request $request)
     {
         if ($request->isMethod('GET')) {

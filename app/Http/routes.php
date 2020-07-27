@@ -35,6 +35,7 @@ $api->version('v1', ['namespace' => 'App\Api\Controllers'], function ($api) {
     $api->any('member/cards', 'MemberController@cards');// 我的卡券
     $api->any('member/useVoucher', 'MemberController@useVoucher');// 使用代金券
     $api->any('member/rechargeList', 'MemberController@rechargeList');// 充值记录
+    $api->any('member/copartnerInfo', 'MemberController@copartnerInfo');// 合伙人基础信息
 
     $api->any('common/getSmsCode', 'CommonController@getSmsCode'); //验证码
     $api->any('common/shareXcx', 'CommonController@shareXcx');  // 分享二维码
