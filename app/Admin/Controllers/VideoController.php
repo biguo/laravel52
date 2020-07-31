@@ -11,6 +11,7 @@ use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 
 
@@ -98,12 +99,19 @@ class VideoController extends Controller
     protected function grid()
     {
         return Admin::grid(Video::class, function (Grid $grid) {
-            $grid->model()->whereIn('status', [Status_Online_video, Status_Review_video, Status_Offline_video])->orderBy('id', 'desc');
+            $grid->model()->whereIn('status', [Status_Online_video, Status_Review_video, Status_Offline_video])
+                ->orderBy(DB::raw('sorted=0'), 'asc')
+                ->orderBy('sorted', 'asc')
+                ->orderBy('id', 'desc')
+            ;
             $grid->disableExport();
             $grid->disableRowSelector();
 
             $grid->id('ID')->sortable();
-            $grid->column('title', '名称');
+            $grid->column('title', '名称')->display(function ($title) {
+                return "<div style='width:450px'>".$title."</div>";
+            });
+            $grid->column('sorted')->editable();
             $grid->column('pic', '图片')->image(Upload_Domain, 150, 100);
 
             $grid->column('状态')->display(function () {
@@ -123,6 +131,20 @@ class VideoController extends Controller
             });
             $grid->created_at();
             $grid->updated_at();
+            $grid->filter(function ($filter) {
+//                $filter->useModal();
+                $filter->disableIdFilter();
+                $filter->like('title', 'Search');
+
+                $baseStatus = [
+                    '1' => '已上线',
+                    '2' => '提交审核中',
+                    '3' => '已下线',
+                    '4' => '驳回'
+                ];
+
+                $filter->is('status', '状态')->select($baseStatus);
+            });
         });
     }
 
@@ -138,6 +160,7 @@ class VideoController extends Controller
             $form->text('title', '标题')->rules('required');
             $form->image('pic', '图片')->rules('required');;
             $form->file('url','视频')->options(['initialPreviewConfig'  => [[ 'type' => 'video', 'filetype' => 'video/mp4']]])->rules('required');
+            $form->text('sorted', '排序')->rules('required|regex:/^[0-9]\d*$/')->default(0);  //非负整数
             $form->checkbox('tags','行在旅途')->options([
                 '呼吸自然'=> '呼吸自然',
                 '夏日避暑地'=> '夏日避暑地',
