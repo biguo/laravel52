@@ -96,12 +96,22 @@ class CopartnerApplyController extends BaseController
             return responseError('请登录');
         }
         if ($request->isMethod('POST')) {
-
-            $data['res'] = DB::table('iceland.ice_rebate as r')->leftJoin('iceland.ice_member as m','m.id','=','r.payerid')
+            $records = DB::table('iceland.ice_rebate as r')->leftJoin('iceland.ice_member as m','m.id','=','r.payerid')
                 ->select('payerid as mid', 'firstrecid as pid', DB::raw('SUM(totalfee) as rebate_amount'), 'nickname','headpic')
                 ->where('types', 1)->where('firstrecid', $mid)->groupBy('payerid')->get();
-            $data['count'] = Member::where('pid' , $mid)->count();
-            $data['totalamount'] = Member::where('id' , $mid)->first()->totalamount;
+
+            $data['res'] = $records;
+            $invite_success = count($records);
+            $count = Member::where('pid' , $mid)->count();
+
+            $data['invite_success'] = $invite_success;
+            $data['inviting'] = ($count >= $invite_success )? ($count - $invite_success) : 0;
+            $amount = 0;
+            foreach ($records as $record){
+                $amount += $record->rebate_amount;
+            }
+
+            $data['totalamount'] = round($amount, 2);
             return responseSuccess($data);
         }
     }

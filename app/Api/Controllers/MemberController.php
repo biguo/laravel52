@@ -83,23 +83,6 @@ class MemberController extends BaseController
     }
 
 
-    public function invitationRebate(Request $request)
-    {
-        if ($request->isMethod('GET')) {
-            $mid = $this->checkLogin($request);
-            $mid =24593;
-//            print_r($mid);
-
-            $data['total'] = DB::table('iceland.ice_rebate as r')
-                ->where(function ($query) use ($mid) {
-                    $query->where('firstrecid', '=', $mid)
-                        ->orWhere('secondrecid', '=', $mid);
-                })->value(DB::raw('if(sum(totalfee) is null ,0,sum(totalfee))'));
-
-            return responseSuccess($data);
-        }
-    }
-
     /**
      * 当前订单
      * @param Request $request
