@@ -16,9 +16,9 @@ class Video extends Model
      * @param null $mid
      * @return mixed
      */
-    public function VideoPublishedList($mid = null)
+    public function VideoPublishedList($mid = null, $order_type = 1)
     {
-        return $this->VideoList($mid);
+        return $this->VideoList($mid, 10, $order_type);
     }
 
 
@@ -38,7 +38,7 @@ class Video extends Model
         $query =  self::from('video as v')
             ->LeftJoin('iceland.ice_member as m', 'v.mid','=','m.id')
             ->LeftJoin('video_like as l', 'v.id','=','l.source_id')
-            ->select('v.id','v.title','v.tags',
+            ->select('v.id','v.title','v.tags','v.sorted',
                 DB::raw("CONCAT('".Upload_Domain."',v.url) as url"),
                 DB::raw("CONCAT('".Upload_Domain."',v.pic) as pic"),
                 'm.nickname',
@@ -53,7 +53,11 @@ class Video extends Model
             if($source_id){
                 $query = $query->orderBy(DB::raw("if(v.id =$source_id, 2, 1)"), 'desc');
             }
-            $res = $query->orderBy(DB::raw("COUNT(l.id) "), 'desc')->paginate($paginate);
+            $res = $query
+                ->orderBy(DB::raw('sorted=0'), 'asc')
+                ->orderBy('sorted', 'asc')
+                ->orderBy(DB::raw("COUNT(l.id) "), 'desc')
+                ->paginate($paginate);
         }
 
         foreach ($res as $item){
