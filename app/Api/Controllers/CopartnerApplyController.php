@@ -6,6 +6,7 @@ use App\Models\CopartnerApply;
 use App\Models\CopartnerRebate;
 use App\Models\Member;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CopartnerApplyController extends BaseController
 {
@@ -61,7 +62,7 @@ class CopartnerApplyController extends BaseController
      *    "mch_id":"1487769092",
      *    "nonce_str":"iZhh3vtKc1KXIAWkmi8n6zVq4M3Ehri9",
      *    "openid":"ocaf_0YXGW2U1wdVWo2LQCGyOkow",
-     *    "out_trade_no":"HOME2018032131226",
+     *    "out_trade_no":"CoP2020072365025_1595468376",
      *    "result_code":"SUCCESS",
      *    "return_code":"SUCCESS",
      *    "sign":"F2DAE8D01E727D8F7BC263B89C9A8906",
@@ -95,7 +96,10 @@ class CopartnerApplyController extends BaseController
             return responseError('请登录');
         }
         if ($request->isMethod('POST')) {
-            $data['res'] = CopartnerRebate::dataList($mid);
+
+            $data['res'] = DB::table('iceland.ice_rebate as r')->leftJoin('iceland.ice_member as m','m.id','=','r.payerid')
+                ->select('payerid as mid', 'firstrecid as pid', DB::raw('SUM(totalfee) as rebate_amount'), 'nickname','headpic')
+                ->where('types', 1)->where('firstrecid', $mid)->groupBy('payerid')->get();
             $data['count'] = Member::where('pid' , $mid)->count();
             $data['totalamount'] = Member::where('id' , $mid)->first()->totalamount;
             return responseSuccess($data);

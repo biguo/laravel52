@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redis;
 
-class CopartnerRebate extends Model
+class CopartnerRebate extends Model  # 废弃
 {
     protected $table = 'copartner_rebate';
     protected $guarded = [];
