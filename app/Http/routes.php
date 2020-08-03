@@ -74,6 +74,8 @@ $api->version('v1', ['namespace' => 'App\Api\Controllers'], function ($api) {
     $api->any('wx/LikeVideo','WeixinController@LikeVideo'); // 点赞/取消视频
     $api->any('wx/getTags','WeixinController@getTags'); // 视频标签
     $api->any('wx/pass','WeixinController@pass'); // 视频标签
+    $api->any('wx/follow','WeixinController@follow'); // 关注/取关作者
+    $api->any('wx/followList','WeixinController@followList'); // 关注列表
 
     $api->any('wx/checkMedia','WeixinController@checkMedia'); // 图片安全内容检测接口
     $api->any('wx/checkContent','WeixinController@checkContent'); // 文字安全内容检测接口

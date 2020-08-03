@@ -3,6 +3,7 @@
 namespace App\Api\Controllers;
 
 use App\Models\FileModel;
+use App\Models\Follow;
 use App\Models\LiveApply;
 use App\Models\Member;
 use App\Models\Streamer;
@@ -500,6 +501,38 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
             VideoLike::create($like);
             return responseSuccess('点赞成功');
         }
+    }
+
+    /**
+     * 关注/取消关注
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function follow(Request $request)
+    {
+        $mid = $this->checkLogin($request);
+        $like['followed'] = $request->get('followed');
+        $like['mid'] = $mid;
+        $first = Follow::where($like)->first();
+        if ($first) {
+            $first->delete();
+            return responseSuccess(['res' => 0, 'msg' => '取消关注']);
+        } else {
+            Follow::create($like);
+            return responseSuccess(['res' => 1, 'msg' => '关注成功']);
+        }
+    }
+
+    /**
+     * 关注视频/直播列表
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function followList(Request $request)
+    {
+        $mid = $this->checkLogin($request);
+        $data = DB::table('follow_list_view')->where('mid', $mid)->get();
+        return responseSuccess($data);
     }
 
     /**
