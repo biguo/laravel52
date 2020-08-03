@@ -40,36 +40,6 @@ class LiveApplyController extends Controller
         });
     }
 
-
-    /**
-     * Edit interface.
-     *
-     * @param $id
-     * @return Content
-     */
-    public function edit($id)
-    {
-        return Admin::content(function (Content $content) use ($id) {
-
-            $content->header('视频');
-            $content->description('description');
-
-            $content->body($this->form()->edit($id));
-        });
-    }
-
-    /**
-     * Make a form builder.
-     *
-     * @return Form
-     */
-    protected function form()
-    {
-        return Admin::form(LiveApply::class, function (Form $form) {
-            $form->display('id', 'ID');
-            $form->text('sorted', '排序')->rules('required|regex:/^[0-9]\d*$/')->default(0);  //非负整数
-        });
-    }
     /**
      * show interface.
      *
@@ -143,8 +113,6 @@ class LiveApplyController extends Controller
             $grid->model()->from('live_apply as a')
                 ->Leftjoin('iceland.ice_member as m', 'm.id', '=', 'a.mid')
                 ->select('a.*', 'm.phone', 'm.nickname')
-                ->orderBy(DB::raw('sorted=0'), 'asc')
-                ->orderBy('sorted', 'asc')
                 ->orderBy('a.id', 'desc');
 
             $grid->disableExport();
@@ -152,7 +120,6 @@ class LiveApplyController extends Controller
             $grid->disableCreation();
             $grid->id('ID')->sortable();
             $grid->column('phone', '手机号');
-            $grid->column('sorted')->editable();
             $grid->column('name', '房间名字');
             $grid->column('nickname', '主播昵称');
             $grid->column('wechat', '主播微信号')->display(function (){
