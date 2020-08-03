@@ -295,10 +295,19 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
         $data['liveStatus'] = $liveStatus;
         $data['liveStr'] = $liveStr;
         $data['roomPic'] = 'http://upload.binghuozhijia.com/uploads/5ef7f838611ae/5ef7f838611ac.jpg';
-        $Rooms = LiveApply::from('live_apply as a')
+        $order_type = $request->get('order_type') ;
+        $order_type = ($order_type === '2' )? 2 :1;
+
+        $Query = LiveApply::from('live_apply as a')
             ->Leftjoin('iceland.ice_member as m', 'm.id', '=', 'a.mid')
             ->select('a.id','a.roomId','a.name', 'a.stage', 'a.status', 'a.mid', 'a.streamer_id', 'a.coverImg', 'a.shareImg', 'a.startTime', 'a.endTime', 'm.nickname as anchor_name', 'm.headpic')
-            ->where('status', 1)->orderBy('stage', 'desc')->get();
+            ->where('status', 1);
+        if($order_type === 2){
+            $Rooms = $Query->orderBy('id', 'desc')->get();
+        }else{
+            $Rooms = $Query->orderBy('stage', 'desc')->get();
+        }
+
         $stagePicArr = [
             '3' => ['pic' => 'http://upload.binghuozhijia.com/uploads/5ef7f017e96fd/5ef7f017e96fb.jpg', 'str' => '直播中'],
             '2' => ['pic' => 'http://upload.binghuozhijia.com/uploads/5ef7eff15bbe8/5ef7eff15bbe5.jpg', 'str' => '即将开始'],
