@@ -42,7 +42,7 @@ class Video extends Model
         $query =  self::from('video as v')
             ->LeftJoin('iceland.ice_member as m', 'v.mid','=','m.id')
             ->LeftJoin('video_like as l', 'v.id','=','l.source_id')
-            ->select('v.id','v.title','v.tags','v.sorted','v.city',
+            ->select('v.id','v.title','v.tags','v.sorted','v.city','v.mid',
                 DB::raw("CONCAT('".Upload_Domain."',v.url) as url"),
                 DB::raw("CONCAT('".Upload_Domain."',v.pic) as pic"),
                 'm.nickname',
@@ -67,10 +67,15 @@ class Video extends Model
         foreach ($res as $item){
             $item->like = 0;
             $item->tags = ($item->tags)? explode(',',$item->tags): [];
+            $item->follow = 0;
             if($mid){
                 $like = VideoLike::where([['source_id','=',$item->id],['mid','=',$mid]])->count();
                 if($like > 0){
                     $item->like = 1;
+                }
+                $follow = Follow::where([['followed','=',$item->mid],['mid','=',$mid]])->count();
+                if($follow > 0){
+                    $item->follow = 1;
                 }
             }
         }

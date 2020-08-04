@@ -359,6 +359,15 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
         $Room = array_only($LiveApply->toarray(), $select);
         $Room['range'] = date("Y-m-d H:i:s", $LiveApply->startTime) . '至' . date("Y-m-d H:i:s", $LiveApply->endTime);
 
+        $Room['mid'] = $LiveApply->mid;
+        $Room['follow'] = 0;
+        if($mid){
+            $follow = Follow::where([['followed','=',$LiveApply->mid],['mid','=',$mid]])->count();
+            if($follow > 0){
+                $Room['follow'] = 1;
+            }
+        }
+
         $stagePicArr = [
             '3' => ['pic' => 'http://upload.binghuozhijia.com/uploads/5ef7f017e96fd/5ef7f017e96fb.jpg', 'str' => '直播中'],
             '2' => ['pic' => 'http://upload.binghuozhijia.com/uploads/5ef7eff15bbe8/5ef7eff15bbe5.jpg', 'str' => '即将开始'],
