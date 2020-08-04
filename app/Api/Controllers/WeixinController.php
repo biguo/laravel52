@@ -468,7 +468,7 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
         $mid = $this->checkLogin($request);
         $order_type = $request->get('order_type') ;
         $order_type = ($order_type === '2' )? 2 :1;
-        $res = (new Video())->VideoPublishedList($mid, $order_type);
+        $res = (new Video())->VideoPublishedList($mid, $order_type, $request->get('city'));
         return responseSuccessArr($res);
     }
 
@@ -480,7 +480,7 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
     public function VideoSlippingList(Request $request)
     {
         $mid = $this->checkLogin($request);
-        $res = (new Video())->VideoPopularityList($mid, $request->get('source_id'));
+        $res = (new Video())->VideoPopularityList($mid, $request->get('source_id'), $request->get('city'));
         return responseSuccessArr($res);
     }
 
