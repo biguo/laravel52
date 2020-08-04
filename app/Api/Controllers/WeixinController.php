@@ -198,6 +198,9 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
                 "coverMedia" => $arr['media_id'], //
                 "shareMedia" => $arr['media_id'], //
             );
+            if(isset($params['city'])){
+                $data['city'] = $params['city'];
+            }
             LiveApply::create($data);
             return responseSuccessArr('创建成功');
         } else {
