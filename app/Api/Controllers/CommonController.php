@@ -81,8 +81,8 @@ class CommonController extends BaseController
 
     // 获取城市 -- 二级联动
     public function  getCityAndArea(Request $request){
-        $pid = $request->get('id');
-        return responseSuccess(DB::connection('original')->table("districts")->where("pid","=",$pid)->select("id","name as text")->get());
+        $pid = $request->get('q');
+        return DB::connection('original')->table("districts")->where("pid","=",$pid)->pluck('name' , 'name');
     }
 
     public function testSMS(){

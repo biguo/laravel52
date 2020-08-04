@@ -189,7 +189,18 @@ class VideoController extends Controller
                 '性价比超高的民宿'=> '性价比超高的民宿'
             ]);
 
-            $form->ignore(['tags']);
+
+
+            $form->select('sheng','省')->options(function($id){
+                return ['-1' => '请选择'] + DB::connection('original')->table("districts")->where("pid","=",0)->pluck('name' , 'id');
+            })->load('city', '/api/getCityAndArea');
+
+            $form->select('city','市')->options(function($city){
+                $city = DB::connection('original')->table("districts")->where("name","=",$city)->pluck('name' , 'name');
+                return $city;
+            });
+
+            $form->ignore(['tags','sheng']);
             $form->saved(function (Form $form){
                 $params = Input::all();
                 if(!empty($params['tags']) && ( $params['tags'] = array_filter($params['tags'])) && ($params['tags']  = implode(',', $params['tags'] ))){
