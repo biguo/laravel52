@@ -302,10 +302,14 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
         $order_type = $request->get('order_type') ;
         $order_type = ($order_type === '2' )? 2 :1;
 
+        $where = [['status','=','1']];
+        if(($city = $request->get('city')) &&($city !== null)){
+            array_push($where, ['city','=',$city]);
+        }
         $Query = LiveApply::from('live_apply as a')
             ->Leftjoin('iceland.ice_member as m', 'm.id', '=', 'a.mid')
             ->select('a.id','a.roomId','a.name', 'a.stage', 'a.status', 'a.mid', 'a.streamer_id', 'a.coverImg', 'a.shareImg', 'a.startTime', 'a.endTime', 'm.nickname as anchor_name', 'm.headpic')
-            ->where('status', 1);
+            ->where($where);
         if($order_type === 2){
             $Rooms = $Query->orderBy('id', 'desc')->get();
         }else{
