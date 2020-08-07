@@ -308,7 +308,7 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
         }
         $Query = LiveApply::from('live_apply as a')
             ->Leftjoin('iceland.ice_member as m', 'm.id', '=', 'a.mid')
-            ->select('a.id','a.roomId','a.name', 'a.stage', 'a.status', 'a.mid', 'a.streamer_id', 'a.coverImg', 'a.shareImg', 'a.startTime', 'a.endTime', 'm.nickname as anchor_name', 'm.headpic')
+            ->select('a.id','a.roomId','a.name', 'a.stage', 'a.status', 'a.mid', 'a.streamer_id', 'a.coverImg', 'a.shareImg', 'a.startTime', 'a.endTime','a.city', 'm.nickname as anchor_name', 'm.headpic')
             ->where($where);
         if($order_type === 2){
             $Rooms = $Query->orderBy('id', 'desc')->get();
