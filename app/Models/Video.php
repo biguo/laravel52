@@ -16,9 +16,9 @@ class Video extends Model
      * @param null $mid
      * @return mixed
      */
-    public function VideoPublishedList($mid = null, $order_type = 1, $city = null)
+    public function VideoPublishedList($mid = null, $order_type = 1, $city = null, $paginate = 10)
     {
-        return $this->VideoList($mid, 10, $order_type, null,  $city);
+        return $this->VideoList($mid, $paginate, $order_type, null,  $city);
     }
 
 
@@ -27,9 +27,9 @@ class Video extends Model
      * @param null $mid
      * @return mixed
      */
-    public function VideoPopularityList($mid = null, $source_id = null, $city = null)
+    public function VideoPopularityList($mid = null, $source_id = null, $city = null, $paginate = 10)
     {
-        return $this->VideoList($mid, 10, 2, $source_id, $city);
+        return $this->VideoList($mid, $paginate, 2, $source_id, $city);
     }
 
 
@@ -52,18 +52,24 @@ class Video extends Model
             ->where($where)
             ->groupBy('v.id');
         if($order_type === 1){
-            $res = $query->orderBy('id', 'desc')->paginate($paginate);
+            $query = $query->orderBy('id', 'desc');
         }else if($order_type === 2 ){
             if($source_id){
                 $query = $query->orderBy(DB::raw("if(v.id =$source_id, 2, 1)"), 'desc');
             }
-            $res = $query
+            $query = $query
                 ->orderBy(DB::raw('sorted=0'), 'asc')
                 ->orderBy('sorted', 'asc')
-                ->orderBy(DB::raw("COUNT(l.id) "), 'desc')
-                ->paginate($paginate);
+                ->orderBy(DB::raw("COUNT(l.id) "), 'desc');
         }
 
+        if($paginate > 0){
+            $res = $query->paginate($paginate);
+        }elseif($paginate === '0'){             #   传0就全数据
+            $res = $query->get();
+        }else{                                  #   不给就默认10
+            $res = $query->paginate(10);
+        }
         foreach ($res as $item){
             $item->like = 0;
             $item->tags = ($item->tags)? explode(',',$item->tags): [];
