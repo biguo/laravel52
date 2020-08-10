@@ -298,7 +298,7 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
         $data['pageStatus'] = $pageStatus;
         $data['liveStatus'] = $liveStatus;
         $data['liveStr'] = $liveStr;
-        $data['roomPic'] = 'http://upload.binghuozhijia.com/uploads/5ef7f838611ae/5ef7f838611ac.jpg';
+        $data['roomPic'] = 'http://upload.binghuozhijia.com/uploads/5f30e0ac37f6c/5f30e0ac37f6a.jpg';
         $order_type = $request->get('order_type') ;
         $order_type = ($order_type === '2' )? 2 :1;
 
@@ -548,6 +548,27 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
     {
         $mid = $this->checkLogin($request);
         $data = DB::table('follow_list_view')->where('mid', $mid)->get();
+        $stagePicArr = [
+            '3' => ['pic' => 'http://upload.binghuozhijia.com/uploads/5ef7f017e96fd/5ef7f017e96fb.jpg', 'str' => '直播中'],
+            '2' => ['pic' => 'http://upload.binghuozhijia.com/uploads/5ef7eff15bbe8/5ef7eff15bbe5.jpg', 'str' => '即将开始'],
+            '1' => ['pic' => 'http://upload.binghuozhijia.com/uploads/5ef7efc82343c/5ef7efc82343a.jpg', 'str' => '已结束'],
+            '0' => ['pic' => '', 'str' => '未通过'],
+        ];
+        foreach ($data as $item){
+            $item->interval = $item->interval.'天前';
+            if($item->source_type === 2){
+                $item->like = 0;
+                $item->like_count = VideoLike::where([['source_id','=',$item->id],['mid','=',$mid]])->count();
+                if($mid){
+                    $like = VideoLike::where([['source_id','=',$item->id],['mid','=',$mid]])->count();
+                    if($like > 0){
+                        $item->like = 1;
+                    }
+                }
+            }else{
+                $item->stagePic = $stagePicArr[$item->stage]['pic'];
+            }
+        }
         return responseSuccess($data);
     }
 
