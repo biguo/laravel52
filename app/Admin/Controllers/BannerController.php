@@ -85,8 +85,8 @@ class BannerController extends Controller
             $grid->disableRowSelector();
             $grid->id('ID')->sortable();
             $grid->title()->editable();
-            $grid->subtitle()->editable();
-            $grid->description()->editable();
+//            $grid->subtitle()->editable();
+//            $grid->description()->editable();
             $grid->image()->image(Upload_Domain, 100, 100);
             $grid->bigImage()->image(Upload_Domain, 100, 100);
             $grid->created_at();
@@ -115,9 +115,9 @@ class BannerController extends Controller
 
             $form->display('id', 'ID');
             $form->text('title', 'title')->rules('required|min:3');
-            $form->text('subtitle', 'subtitle')->rules('required|min:3');
-            $form->text('subtitle1', 'subtitle')->placeholder('副标题第二行')->rules('min:3');
-            $form->text('description', 'description')->rules('required|min:3');
+//            $form->text('subtitle', 'subtitle')->rules('required|min:3');
+//            $form->text('subtitle1', 'subtitle')->placeholder('副标题第二行')->rules('min:3');
+//            $form->text('description', 'description')->rules('required|min:3');
             $form->image('image', 'image');
             $form->image('bigImage', '长图');
             $form->hidden('sort');
