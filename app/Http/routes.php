@@ -44,6 +44,7 @@ $api->version('v1', ['namespace' => 'App\Api\Controllers'], function ($api) {
     $api->post('common/Refund', 'CommonController@Refund');  //退款
 
     $api->any('banner/list', 'BannerController@getList');  //轮播图
+    $api->any('banner/pictures', 'BannerController@pictures');  //
 
     $api->any('product/orderShowBefore', 'ProductController@orderShowBefore');  //下单前页面
     $api->any('product/getList', 'ProductController@getList');  //会员卡列表

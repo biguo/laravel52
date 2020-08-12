@@ -349,7 +349,7 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
 
         $LiveApply = LiveApply::where('id', $id)->first();
 
-        $select =  ['name', 'stage', 'coverImg', 'startTime', 'endTime', 'roomId'];
+        $select =  ['name', 'stage', 'coverImg', 'startTime', 'endTime', 'roomId', 'city'];
         if ($LiveApply->stage === 1) {
             if ($LiveApply->live_replay === null) {
                 $this->getReplay($LiveApply->roomId, $LiveApply);
@@ -567,6 +567,8 @@ class WeixinController extends BaseController   // 微信/小程序一系列接�
                 }
             }else{
                 $item->stagePic = $stagePicArr[$item->stage]['pic'];
+                $item->stageStr = $stagePicArr[$item->stage]['str'];
+                $item->ImUpload = ($item->followed === $mid);
             }
         }
         return responseSuccess($data);
