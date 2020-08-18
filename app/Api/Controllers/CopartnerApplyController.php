@@ -28,7 +28,7 @@ class CopartnerApplyController extends BaseController
             $attr = array_except($all, ['trade_no', 'id', 'piece']);
             $attr['mid'] = $mid;
 
-            $basePrice = 1;
+            $basePrice = 10000;  #基准价格
             $attr['price'] = $request->get('piece') * $basePrice;
 
             if(isset($all['trade_no']) && isset($all['id'])){

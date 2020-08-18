@@ -18,7 +18,7 @@ class BannerController extends BaseController
     public function pictures()
     {
         return responseSuccess([
-            'http://upload.binghuozhijia.com/uploads/5f33813e91847/5f33813e91845.jpg',
+            'http://upload.binghuozhijia.com/uploads/5f338961e71b7/5f338961e71b5.jpg',
             'http://upload.binghuozhijia.com/uploads/5f3381930b3ca/5f3381930b3c8.jpg',
             'http://upload.binghuozhijia.com/uploads/5f33827be0cea/5f33827be0ce8.jpg',
             'http://upload.binghuozhijia.com/uploads/5f3383302132a/5f33833021328.jpg',
