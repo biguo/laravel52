@@ -5,6 +5,7 @@ namespace App\Api\Controllers;
 use App\Models\FileModel;
 use App\Models\Member;
 use Illuminate\Support\Facades\Redis;
+use Tools\Pay\Wechatpay;
 use Tools\SmsCode\SmsCode;
 use Validator;
 use Illuminate\Http\Request;
@@ -88,4 +89,14 @@ class CommonController extends BaseController
     public function testSMS(){
         (new SmsCode())->SendYunmsg('15062314180', '550880');
     }
+
+
+    /**
+     * 退款
+     */
+    public function Refund(Request $request)
+    {
+
+    }
+
 }
